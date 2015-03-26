@@ -1,0 +1,54 @@
+ <!DOCTYPE html>
+<html>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	<script src="tools.js"></script>
+<head>
+<meta charset="UTF-8">
+<title>Bryan Chau - Playground</title>
+</head>
+
+<body>
+	<!-- HEADER-->
+	<div id = "north" class="banner">
+		<h1>RIOT API</h1>
+	</div>
+	
+	
+	
+	<!-- NAVIGATION-->
+	<div id = "nav">
+		<ul>
+		<li><a href="#">Home</a></li>
+		</ul>
+	</div>
+
+	<!-- CENTER PAGE CONTENT-->
+	<div id = "center" class="clearfix">
+		
+		<!-- RIOT API -->
+		<div id="post" >
+
+			Summoner Name
+			<br />
+			<input id="userName" />
+			<input type="submit" onclick="summonerLookUp();" />
+			<br />
+			<br />Summoner Level: <span id="sLevel"></span>
+
+			<br />Summoner ID: <span id="sID"></span>
+			<br />
+
+			<br />
+			List of mastery pages (<span id="masteryPagesCount"></span>)
+			<hr />
+			<span id="masteryPagesAll"></span>
+		</div>
+	</div>
+	
+	<!-- FOOTER-->
+	<div id = "south" class="banner">
+		<footer><h6>© Bryan Chau - CopyRight 2015</h6></footer>
+	</div>
+</body>
+
+</html> 
