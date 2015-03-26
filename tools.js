@@ -7,7 +7,7 @@ function summonerLookUp() {
     //APIKEY = $("#theKey").val();
 	window.alert("Hello "+ID);
 
-    if (ID !== "") {
+    if (ID != "") {
 
         $.ajax({
             url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
@@ -50,7 +50,7 @@ function letsGetMasteries(summonerID) {
         success: function (resp) {
             numberOfPages = resp[summonerID].pages.length;            
             document.getElementById("masteryPagesCount").innerHTML = numberOfPages;
-            
+            document.getElementById("masteryPagesAll").innerHTML = "";
             resp[summonerID].pages.forEach(function (item) {
 document.getElementById("masteryPagesAll").innerHTML = document.getElementById("masteryPagesAll").innerHTML + item.name + "<br />";
             });
