@@ -1,5 +1,5 @@
 var ID = "";
-var APIKEY = "a202172b-de9e-497e-b13d-a0600e839d90";
+var APIKEY = "ef97109d-5c86-4467-a021-45c4d36fdf86";//"a202172b-de9e-497e-b13d-a0600e839d90";
 
 function summonerLookUp() {
     //ID = $("#userName").val();
@@ -16,18 +16,16 @@ function summonerLookUp() {
 
             },
             success: function (json) {
-                var userID = ID.replace(" ", "");
+                var userID = ID.toLowerCase().trim();
 
-                userID = userID.toLowerCase().trim();
-
-                summonerLevel = json[userID].summonerLevel;
-                summonerID = json[userID].id;
+                var summonerLevel = json[userID].summonerLevel;
+                var summonerID = json[userID].id;
 
                 document.getElementById("sLevel").innerHTML = summonerLevel;
                 document.getElementById("sID").innerHTML = summonerID;
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
-                window.alert("error getting Summoner data1!");
+                window.alert("error getting Summoner data1! "+errorThrown);
             }
         });
     } else {
@@ -61,7 +59,7 @@ document.getElementById("masteryPagesAll").innerHTML = document.getElementById("
 }
 
 
-function getMatchHistory(summonerID){
+function getMatchHistory(){
 	summonerLookUp();
 	var summonerID = document.getElementById("sID").innerHTML;
 	$.ajax({
