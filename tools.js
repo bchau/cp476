@@ -5,7 +5,6 @@ function summonerLookUp() {
     //ID = $("#userName").val();
 	ID = document.getElementById("userName").value;
     //APIKEY = $("#theKey").val();
-	window.alert("Hello "+ID);
 
     if (ID != "") {
 
@@ -26,9 +25,6 @@ function summonerLookUp() {
 
                 document.getElementById("sLevel").innerHTML = summonerLevel;
                 document.getElementById("sID").innerHTML = summonerID;
-
-                letsGetMasteries(summonerID);
-
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 window.alert("error getting Summoner data1!");
@@ -39,7 +35,9 @@ function summonerLookUp() {
 	}
 }
 
-function letsGetMasteries(summonerID) {
+function letsGetMasteries() {
+	summonerLookUp();
+	var summonerID = document.getElementById("sID").innerHTML;
     $.ajax({
         url: "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + summonerID + "/masteries?api_key=" + APIKEY,
         type: 'GET',
@@ -60,4 +58,24 @@ document.getElementById("masteryPagesAll").innerHTML = document.getElementById("
             alert("error getting Summoner data2!");
         }
     });
+}
+
+
+function getMatchHistory(summonerID){
+	summonerLookUp();
+	var summonerID = document.getElementById("sID").innerHTML;
+	$.ajax({
+		url: "https://na.api.pvp.net/api/lol/"+region+"/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
+		type: 'GET',
+		dataType: 'json',
+		data: {
+		
+		},
+		success:function (resp){
+			alert("got it.");
+		},
+		error:function (XMLHttpRequest, textStatus, errorThrown){
+			alert("error getting match history");
+		}
+	});
 }
