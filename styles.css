@@ -52,12 +52,13 @@ img{
 }
 
 body{
-	background-image: url("bg.gif");
-	background-repeat: no-repeat;
+	background-image: url("bg3.png");
+	background-repeat: repeat-y;
     background-attachment: scroll;
     background-position: center top; 
-	background-size:100%;
+	background-size: auto;
 	font-family:"Calibri";
+	margin:0dp;
 }
 
 
