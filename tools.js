@@ -127,7 +127,7 @@ function getMatchHistory(){
 function addLoadSpinner(){
    
 $('#overlay').remove();
-   $("body").append("<div id='overlay'><img src='loading.gif'></div>");
+   $("#center").append("<div id='overlay'><img src='loading.gif'></div>");
 }
 
 function removeLoadSpinner(){

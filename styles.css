@@ -145,14 +145,11 @@ body{
 
 #overlay img{
 
-	position: absolute;
-    left:0;
-    right:0;
-	margin-top:auto;
-    margin-left:auto;
-    margin-right:auto;
+	position: relative;
+    left:50%;
+    right:50%;
 	border: none;
-	transform: translate(0,50%);
+	transform: translate(-50%, 30%);
 }
 
 .box {
