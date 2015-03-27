@@ -4,11 +4,13 @@
 }
 
 .banner{
-	width:95%;
+	width:1250px;
 	margin:auto;
+	margin-top:1px;
+	margin-bottom:1px;
+	padding:1px;
 	color:white;
 	background-color: rgba(0,0,0,0.85);	
-	border:1px dotted white;
 }
 
 .page-wrap {
@@ -57,7 +59,7 @@ body{
 #north {
 	text-align:center;
 	position: relative;
-	height:125px;
+	height:85px;
 }
 
 #nav{
@@ -95,11 +97,16 @@ body{
 #nav a:hover{
 	background-color: rgba(222,222,0,0.9);
 	
+	text-align:center;
+}
+
+#new-nav{
+	background-color: rgba(126,126,126,0.9);
 }
 
 #center {
 	top:5px;
-	width:50%;
+	width:800px;
 	padding:15px 2.5% 15px 2.5%;
 	position: relative;
 	margin-left: auto;
@@ -109,16 +116,113 @@ body{
 }
 
 #post {
+	margin-bottom: 5%;
 	margin-top: 5%;
 	padding:15px 2.5% 15px 2.5%;
 	background-color: rgba(126,126,126,1);
 }
 
 #south {
-	text-align:center;
+	text-align:right;
+	padding-right:15px;
 	position: relative;
     left: 0;
     bottom: 0;
-    height: 100px;
+    height: 60px;
 }
 
+.box {
+    margin:2px 2px 2px 2px;
+    display:inline-block;
+    width:215px;
+    height:50px;
+    padding:15px;
+    background-color: rgba(0, 0, 0,.7);
+	border: 1px solid black;
+    color:white;
+    -webkit-transition:all 0.2s ease;
+    -moz-transition:all 0.2s ease;
+    background-position:320px 50%;
+    background-repeat:no-repeat;
+    text-decoration: none;
+}
+
+.box h5 {
+    font: bold 24px Sans-Serif !important;
+    text-transform:uppercase;
+    font-size:38px;
+    line-height:1;
+    padding:0 0 10px 0;
+}
+.box:hover h5 {
+    text-shadow:0 0 4px rgba(0,0,0,0.4);
+    color:white;
+}
+.box:hover p {
+    color:white;
+}
+.box p {
+    font-size:12px;
+    width:175px;
+    line-height:1.5;
+}
+.box:hover {
+    background-position:200px 50%;
+}
+#f-diw {
+    background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
+    background-position:300px -1288px;
+}
+#f-diw:hover {
+    background-color:#237abe;
+    background-position:150px -1288px;
+}
+#f-qod {
+    background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
+    background-position:290px -1448px;
+}
+#f-qod:hover {
+    background-color:#37597a;
+    background-position:150px -1448px;
+}
+#f-htmlipsum {
+    background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
+    background-position:290px -1608px;
+}
+#f-htmlipsum:hover {
+    background-color:#333333;
+    background-position:150px -1608px;
+}
+#f-qod:hover p {
+    color:#adbde3;
+}
+#f-bookshelf {
+    background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
+    background-position:290px -1768px;
+}
+#f-bookshelf:hover {
+    background-color:#ff8400;
+    background-position:150px -1768px;
+}
+#f-html-ipsum:hover p {
+    color:#fff8da;
+}
+#f-twitter {
+    background-image:url(http://css-tricks.com/images/css-tricks.png);
+    background-position:290px -1928px;
+}
+#f-twitter:hover {
+    background-color:#4ed2fe;
+    background-position:186px -1928px;
+}
+#f-forrst {
+    background-image:url(http://css-tricks.com/images/css-tricks.png);
+    background-position:290px -2088px;
+}
+#f-forrst:hover {
+    background-color:#203f16;
+    background-position:186px -2088px;
+}
+#f-forrst:hover p {
+    color: #92c59c;
+}
