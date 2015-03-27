@@ -19,13 +19,13 @@ function summonerLookUp( ID) {
 			return summonerID;
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			window.alert("error getting Summoner data1! "+errorThrown);
+			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
 		}
 	});
 }
 
 function letsGetMasteries() {
-	
+	addLoadSpinner();
 	ID = document.getElementById("userName").value;
 	$.when($.ajax({ //wait for response summoner
 		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
@@ -44,7 +44,8 @@ function letsGetMasteries() {
 			return summonerID;
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			window.alert("error getting Summoner data1! "+errorThrown);
+			removeLoadSpinner();
+			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
 		}
 	})).done( function(){ //retrieve masteries
 			if (summonerID != 0){
@@ -62,10 +63,14 @@ function letsGetMasteries() {
 						resp[summonerID].pages.forEach(function (item) {
 						document.getElementById("masteryPagesAll").innerHTML = document.getElementById("masteryPagesAll").innerHTML + item.name + "<br />";
 						});
+						
+						removeLoadSpinner();
 					},
 
 					error: function (XMLHttpRequest, textStatus, errorThrown) {
+						
 						alert("error getting Summoner data2!");
+						removeLoadSpinner();
 					}
 				});
 			}
@@ -75,6 +80,7 @@ function letsGetMasteries() {
 
 
 function getMatchHistory(){
+	addLoadSpinner();
 	ID = document.getElementById("userName").value;
 	$.when($.ajax({ //wait for response summoner
 		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
@@ -93,7 +99,8 @@ function getMatchHistory(){
 			return summonerID;
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			window.alert("error getting Summoner data1! "+errorThrown);
+			removeLoadSpinner();
+			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
 		}
 	})).done( function(){
 		if (summonerID != 0){
@@ -105,11 +112,24 @@ function getMatchHistory(){
 			
 			},
 			success:function (resp){
+				removeLoadSpinner();
 				alert("got it.");
 			},
 			error:function (XMLHttpRequest, textStatus, errorThrown){
+				removeLoadSpinner();
 				alert("error getting match history");
+				
 			}
 		});
 	}});
+}
+
+function addLoadSpinner(){
+   
+$('#overlay').remove();
+   $("body").append("<div id='overlay'><img src='loading.gif'></div>");
+}
+
+function removeLoadSpinner(){
+	$('#overlay').remove();
 }
