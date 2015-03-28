@@ -24,7 +24,7 @@ function summonerLookUp( ID) {
 	});
 }
 
-function letsGetMasteries() {
+function getMasteries() {
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
 	$.when($.ajax({ //wait for response summoner
@@ -112,8 +112,78 @@ function getMatchHistory(){
 			
 			},
 			success:function (resp){
+				matches =resp['matches'];
+				document.getElementById("matchesAll").innerHTML = "";
+				matches.forEach(function (match) {
+						var stats = match.participants[0].stats;
+						document.getElementById("matchesAll").innerHTML = "Match ID: "+match.matchId + 
+						"<br> Queue Type: "+match.queueType+ 
+						"<br>MapId: "+ match.mapId+ 
+						"<br>ChampionId: " + match.participants[0].championId + 
+						"<br>KDA: " + stats.kills +"/" +stats.deaths+"/"+stats.assists +
+						"<br><hr>" + document.getElementById("matchesAll").innerHTML;
+						
+						/*stats: Object
+						assists: 7
+						champLevel: 18
+						combatPlayerScore: 0
+						deaths: 5
+						doubleKills: 1
+						firstBloodAssist: false
+						firstBloodKill: false
+						firstInhibitorAssist: true
+						firstInhibitorKill: false
+						firstTowerAssist: false
+						firstTowerKill: false
+						goldEarned: 13504
+						goldSpent: 11905
+						inhibitorKills: 0
+						item0: 3001
+						item1: 3020
+						item2: 3165
+						item3: 3089
+						item4: 3191
+						item5: 0
+						item6: 3361
+						killingSprees: 1
+						kills: 6
+						largestCriticalStrike: 0
+						largestKillingSpree: 4
+						largestMultiKill: 2
+						magicDamageDealt: 152462
+						magicDamageDealtToChampions: 17877
+						magicDamageTaken: 13196
+						minionsKilled: 213
+						neutralMinionsKilled: 6
+						neutralMinionsKilledEnemyJungle: 2
+						neutralMinionsKilledTeamJungle: 4
+						objectivePlayerScore: 0
+						pentaKills: 0
+						physicalDamageDealt: 25002
+						physicalDamageDealtToChampions: 2258
+						physicalDamageTaken: 6292
+						quadraKills: 0
+						sightWardsBoughtInGame: 0
+						totalDamageDealt: 177764
+						totalDamageDealtToChampions: 20160
+						totalDamageTaken: 19901
+						totalHeal: 3802
+						totalPlayerScore: 0
+						totalScoreRank: 0
+						totalTimeCrowdControlDealt: 210
+						totalUnitsHealed: 3
+						towerKills: 2
+						tripleKills: 0
+						trueDamageDealt: 300
+						trueDamageDealtToChampions: 25
+						trueDamageTaken: 412
+						unrealKills: 0
+						visionWardsBoughtInGame: 2
+						wardsKilled: 0
+						wardsPlaced: 28
+						winner: true*/
+						});
 				removeLoadSpinner();
-				alert("got it.");
 			},
 			error:function (XMLHttpRequest, textStatus, errorThrown){
 				removeLoadSpinner();
@@ -124,10 +194,11 @@ function getMatchHistory(){
 	}});
 }
 
+//load spinner
 function addLoadSpinner(){
-   
-$('#overlay').remove();
-   $("#center").append("<div id='overlay'><img src='loading.gif'></div>");
+	$('#overlay').remove();
+	$("#center").append("<div id='overlay'><img src='loading.gif'></div>");
+
 }
 
 function removeLoadSpinner(){
