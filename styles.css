@@ -44,7 +44,7 @@ img{
 }
 
 body{
-	background-image: url("bg3.png");
+	background-image: url("images/bg.png");
 	background-repeat: repeat-y;
     background-attachment: scroll;
     background-position: center top; 
