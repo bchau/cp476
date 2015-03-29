@@ -194,7 +194,7 @@ body{
     background-position:300px 10px;
 }
 #button-match-history:hover {
-    background-color:rgb(75,0,130);
+    background-color:rgb(76,0,153);
     background-position:150px 10px;
 }
 #button-match-history:hover h5{
@@ -213,49 +213,6 @@ body{
 #button-masteries:hover h5{
 	text-shadow: 0.1em 0.1em 0.2em black
 }
-
-#f-htmlipsum {
-    background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
-    background-position:290px -1608px;
-}
-#f-htmlipsum:hover {
-    background-color:#333333;
-    background-position:150px -1608px;
-}
-#f-qod:hover p {
-    color:#adbde3;
-}
-#f-bookshelf {
-    background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
-    background-position:290px -1768px;
-}
-#f-bookshelf:hover {
-    background-color:#ff8400;
-    background-position:150px -1768px;
-}
-#f-html-ipsum:hover p {
-    color:#fff8da;
-}
-#f-twitter {
-    background-image:url(http://css-tricks.com/images/css-tricks.png);
-    background-position:290px -1928px;
-}
-#f-twitter:hover {
-    background-color:#4ed2fe;
-    background-position:186px -1928px;
-}
-#f-forrst {
-    background-image:url(http://css-tricks.com/images/css-tricks.png);
-    background-position:290px -2088px;
-}
-#f-forrst:hover {
-    background-color:#203f16;
-    background-position:186px -2088px;
-}
-#f-forrst:hover p {
-    color: #92c59c;
-}
-
 .champion-icon {
 	margin:2px 2px 2px 2px;
     display:inline-block;
