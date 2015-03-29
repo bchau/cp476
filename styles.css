@@ -59,6 +59,8 @@ body{
 	text-align:center;
 	position: relative;
 	height:85px;
+	margin-top:85px;
+	margin-bottom:25px;
 }
 
 #nav{
@@ -187,22 +189,31 @@ body{
 .box:hover {
     background-position:200px 50%;
 }
-#f-diw {
-    background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
-    background-position:300px -1288px;
+#button-match-history {
+    background-image:url(images/match_history.png);
+    background-position:300px 10px;
 }
-#f-diw:hover {
-    background-color:#237abe;
-    background-position:150px -1288px;
+#button-match-history:hover {
+    background-color:rgb(75,0,130);
+    background-position:150px 10px;
 }
-#f-qod {
-    background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
-    background-position:290px -1448px;
+#button-match-history:hover h5{
+	text-shadow: 0.1em 0.1em 0.2em black
 }
-#f-qod:hover {
-    background-color:#37597a;
-    background-position:150px -1448px;
+
+#button-masteries {
+    background-image:url(images/masteries.png);
+    background-position:300px 10px;
 }
+#button-masteries:hover {
+    background-color:rgb(192,255,255);
+    background-position:150px 10px;
+}
+
+#button-masteries:hover h5{
+	text-shadow: 0.1em 0.1em 0.2em black
+}
+
 #f-htmlipsum {
     background-image:url(http://cdn.css-tricks.com/wp-content/themes/CSS-Tricks-8/images/css-tricks.png);
     background-position:290px -1608px;
@@ -257,4 +268,14 @@ body{
     -moz-transition:all 0.2s ease;
     background-repeat:no-repeat;
     text-decoration: none;
+}
+
+.map-icon {
+    display:inline-block;
+    width:100%;
+	height:100%;
+    color:white;
+    text-decoration: none;
+	bottom:0dp;
+	right:0dp;
 }

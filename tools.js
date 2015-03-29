@@ -284,3 +284,41 @@ function getChampionIconById(ID){
 	}
 	return champs[ID];
 }
+
+function showMatchHistory(){
+	 $(document).ready(function() {
+	 $.ajax({
+            url : "matchhistory.html",
+			async: false,
+			dataType: 'html',
+			data: {
+			
+			},
+            success : function (data) {
+				$('#center').html(data);
+            },
+			error:function (){
+				alert("error: could not load match history html");
+			}
+        });
+	 });
+}
+
+function showMasteries(){
+	$(document).ready(function() {
+	 $.ajax({
+            url : "masteries.html",
+			async: false,
+			dataType: 'html',
+			data: {
+			
+			},
+            success : function (data) {
+				$('#center').html(data);
+            },
+			error:function (){
+				alert("error: could not load masteries html");
+			}
+        });
+	 });
+}
