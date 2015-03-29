@@ -11,6 +11,15 @@
 	padding:1px;
 	color:white;
 	background-color: rgba(0,0,0,0.85);	
+    text-decoration: none;
+}
+
+.banner-box {
+    display:inline-block;
+    width:1250px;
+    height:auto;
+    color:white;
+    text-decoration: none;
 }
 
 .page-wrap {
@@ -60,7 +69,15 @@ body{
 	position: relative;
 	height:85px;
 	margin-top:85px;
-	margin-bottom:25px;
+	margin-bottom:15px;
+	border: 1px solid black;
+    background-image:url(images/banner.png);
+	-khtml-opacity:.97; 
+	 -moz-opacity:.97; 
+	 -ms-filter:"alpha(opacity=97)";
+	  filter:alpha(opacity=97);
+	  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0.3);
+	  opacity:.97; 
 }
 
 #nav{
@@ -130,6 +147,7 @@ body{
     left: 0;
     bottom: 0;
     height: 60px;
+	border: 1px solid black;
 }
 
 #overlay {
