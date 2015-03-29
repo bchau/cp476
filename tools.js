@@ -113,75 +113,24 @@ function getMatchHistory(){
 			},
 			success:function (resp){
 				matches =resp['matches'];
-				document.getElementById("matchesAll").innerHTML = "";
+				document.getElementById("matchesAll").innerHTML = "</table>";
 				matches.forEach(function (match) {
 						var stats = match.participants[0].stats;
-						document.getElementById("matchesAll").innerHTML = "Match ID: "+match.matchId + 
-						"<br> Queue Type: "+match.queueType+ 
-						"<br>MapId: "+ match.mapId+ 
-						"<br>ChampionId: " + match.participants[0].championId + 
-						"<br>KDA: " + stats.kills +"/" +stats.deaths+"/"+stats.assists +
-						"<br><hr>" + document.getElementById("matchesAll").innerHTML;
-						
-						/*stats: Object
-						assists: 7
-						champLevel: 18
-						combatPlayerScore: 0
-						deaths: 5
-						doubleKills: 1
-						firstBloodAssist: false
-						firstBloodKill: false
-						firstInhibitorAssist: true
-						firstInhibitorKill: false
-						firstTowerAssist: false
-						firstTowerKill: false
-						goldEarned: 13504
-						goldSpent: 11905
-						inhibitorKills: 0
-						item0: 3001
-						item1: 3020
-						item2: 3165
-						item3: 3089
-						item4: 3191
-						item5: 0
-						item6: 3361
-						killingSprees: 1
-						kills: 6
-						largestCriticalStrike: 0
-						largestKillingSpree: 4
-						largestMultiKill: 2
-						magicDamageDealt: 152462
-						magicDamageDealtToChampions: 17877
-						magicDamageTaken: 13196
-						minionsKilled: 213
-						neutralMinionsKilled: 6
-						neutralMinionsKilledEnemyJungle: 2
-						neutralMinionsKilledTeamJungle: 4
-						objectivePlayerScore: 0
-						pentaKills: 0
-						physicalDamageDealt: 25002
-						physicalDamageDealtToChampions: 2258
-						physicalDamageTaken: 6292
-						quadraKills: 0
-						sightWardsBoughtInGame: 0
-						totalDamageDealt: 177764
-						totalDamageDealtToChampions: 20160
-						totalDamageTaken: 19901
-						totalHeal: 3802
-						totalPlayerScore: 0
-						totalScoreRank: 0
-						totalTimeCrowdControlDealt: 210
-						totalUnitsHealed: 3
-						towerKills: 2
-						tripleKills: 0
-						trueDamageDealt: 300
-						trueDamageDealtToChampions: 25
-						trueDamageTaken: 412
-						unrealKills: 0
-						visionWardsBoughtInGame: 2
-						wardsKilled: 0
-						wardsPlaced: 28
-						winner: true*/
+						var num = getChampionIconById(match.participants[0].championId);
+						var size = 48;
+						var page = Math.floor(num/30);
+						var row = Math.floor((num%30)/10)*size;
+						var col = (num%10)*size;
+						document.getElementById("matchesAll").innerHTML = 
+						"<tr><td>"+
+							"<a class='champion-icon' style='background-image:url(images/champion"+page+".png);background-position:-"+col+"px -"+row+"px;'></a>"+
+							"<br>ChampionId: " + match.participants[0].championId + 
+						"</td><td>"+
+							"Match ID: "+match.matchId + 
+							"<br>Queue Type: "+match.queueType+ 
+							"<br>MapId: "+ match.mapId+ 
+							"<br>KDA: " + stats.kills +"/" +stats.deaths+"/"+stats.assists +
+						"</td></tr>"+ document.getElementById("matchesAll").innerHTML;
 						});
 				removeLoadSpinner();
 			},
@@ -203,4 +152,134 @@ function addLoadSpinner(){
 
 function removeLoadSpinner(){
 	$('#overlay').remove();
+}
+
+function getChampionIconById(ID){
+	var page = 30;
+	var champs = {};
+	champs[1] = 6; //annie
+	champs[2] = page*2+10; //olaf
+	champs[3] = 26; //galio
+	champs[4] = page*3 + 11; //twisted fate
+	champs[5] = page*3 + 25; // xinzhao
+	champs[6] = page*3 + 14; //urgot
+	champs[7] = page*1 + 19; // leblanc
+	champs[8] = page*3 +  21; // vladimir
+	champs[9] = 23; //fiddlesticks
+	champs[10] = page*1 + 15; //kayle
+	champs[11] = page*1 + 29; // master yi
+	champs[12] = 3; //alistar
+	champs[13] = page*2 + 21; // ryze
+	champs[14] = page*2 + 27; //sion
+	champs[15] = page*2 + 28; //sivir
+	champs[16] = page*3 + 1; //soraka
+	champs[17] = page*3 + 6; // teemo
+	champs[18] = page*3 + 8; // tristana
+	champs[19] = page*3 + 23; // warwick
+	champs[20] = page*2 + 9; //nunu
+	champs[21] = page*2 + 0; //miss fortune
+	champs[22] = 7; //ashe
+	champs[23] = page*3 + 10; // tryndamere
+	champs[24] = page*1 + 7; //jax
+	champs[25] = page*2 + 3; //morgana
+	champs[26] = page*4 + 1; // zilean
+	champs[27] = page*2 + 26; // singed
+	champs[28] = 21; //evelynn
+	champs[29] = page*3 + 12; // twitch
+	champs[30] = page*1 + 12; //karthus
+	champs[31] = 14; //chogath
+	champs[32] = 4; //amumu
+	champs[33] = 15; // rammus
+	champs[34] = 5; //anivia
+	champs[35] = page*2 + 23; // shaco
+	champs[36] = 19; //Dr.Mundo
+	champs[37] = page*3 + 0; // sona 
+	champs[38] = page*1 + 13; // kassadin
+	champs[39] = page*1 + 4; //irelia
+	champs[40] = page*1 + 5; // janna
+	champs[41] = 27; //gangplank
+	champs[42] = 15; //corki
+	champs[43] = page*1 + 11; // karma
+	champs[44] = page*3 + 5; // taric
+	champs[45] = page*3 + 17; // veigar
+	champs[48] = page*3 + 9; //trundle
+	champs[50] = page*3 + 2; //swain
+	champs[51] = 12; //caitlyn
+	champs[53] = 9; //blitzcrank
+	champs[54] = page*1 + 26; // malphite
+	champs[55] = page*1 + 14; // katarina
+	champs[56] = page*2 + 8; // nocturne
+	champs[57] = page*1 + 28; // maokai
+	champs[58] = page*2 + 17; // renekton
+	champs[59] = page*1 + 6; //jarvanIV
+	champs[60] = 20; //elise
+	champs[61] = page*2 + 11; // orianna
+	champs[62] = page*2 + 1; //wukong
+	champs[63] = 10; //brand
+	champs[64] = page*1 + 20; //leesin
+	champs[67] = page*3 + 16; // vayne
+	champs[68] = page*2 + 20; //rumble
+	champs[69] = 13; //cassiopeia
+	champs[72] = page*2 + 29; // skarner
+	champs[74] = page*1 + 3; //heimerdinger
+	champs[75] = page*2 + 5; // nasus
+	champs[76] = page*2 + 7; // nidalee
+	champs[77] = page*3 + 13; // udyr
+	champs[78] = page*2 + 13; // poppy
+	champs[79] = page*1 + 0; //gragas
+	champs[80] = page*2 + 12; // pantheon
+	champs[81] = 22; //ezreal
+	champs[82] = page*2 + 2; //mordekaiser
+	champs[83] = page*3 + 7; //yorick
+	champs[84] = 2; //akali
+	champs[85] = page*1 + 16;
+	champs[86] = 28; //garen
+	champs[89] = page*1 + 21; //leona
+	champs[90] = page*1 + 27; // malzahar
+	champs[91] = page*3 + 4; //talon
+	champs[92] = page*2 + 19; // riven
+	champs[96] = page*1 + 18; //kogmaw
+	champs[98] = page*2 + 24; // shen
+	champs[99] = page*1 + 25; // lux
+	champs[101] = page*3 + 24; // xerath
+	champs[102] = page*2 + 25; //shyvana
+	champs[103] = 1; //ahri
+	champs[104] = page*1 + 1; //graves
+	champs[105] = 25; //fizz
+	champs[106] = page*3 + 22; // volibear
+	champs[107] = page*2 + 18; // rengar
+	champs[110] = page*3 + 15; //varus
+	champs[111] = page*2 + 6; // nautilus
+	champs[112] = page*3 + 20; // viktor
+	champs[113] = page*2 + 22; //sejuani
+	champs[114] = 24; //fiora
+	champs[115] = page*4 + 0; // ziggs
+	champs[117] = page*1 + 24; // lulu
+	champs[119] = 18; //draven
+	champs[120] = page*1 + 2; //hecarim
+	champs[121] = page*1 + 17; //khazix
+	champs[122] = 16; //darius
+	champs[126] = page*1 + 8; //jayce
+	champs[127] = page*1 + 22; //lissandra
+	champs[133] = page*2 + 14; //quinn
+	champs[134] = page*3 + 3; // syndra
+	champs[131] = 17; //diana
+	champs[143] = page*4 + 2; // zyra
+	champs[150] = 29; //gnar
+	champs[154] = page*3 + 28; // zac
+	champs[157] = page*3 + 26; // yasuo
+	champs[161] = page*3 + 18; //velkoz
+	champs[201] = 11; //braum
+	champs[222] = page*1 + 9; //jinx
+	champs[236] = page*1 + 23; // lucian
+	champs[238] = page*3 + 29; // zed
+	champs[254] = page*3 + 19; // vi
+	champs[266] = 0; //aatrox
+	champs[267] = page*2 + 4; // nami
+	champs[268] = 8; //azir
+	champs[412] = page*3 + 7; // thresh
+	champs[421] = page*2 + 16; // reksai
+	champs[429] = page*1 + 10; // kalista 
+	champs[432] = page*4+3; //bard
+	return champs[ID];
 }

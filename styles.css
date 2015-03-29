@@ -22,22 +22,21 @@
 }
 
 
+table, tr {
+ width:100%;
+}
+
+tr {
+	background-color: rgba(255,255,255,0.5);
+	padding: 5px 2px;
+}
+
+tr:hover{
+	background-color: rgba(255,255,255,1);
+}
+
 h2, h3,h4,h5{
 	align-self:center;
-}
-
-table{
-	background-color:#c0c0c0;
-	border:1px solid black;
-}
-
-th{
-	align-self:center;
-	border:1px solid black;
-	width: 10%;
-	height:15px;
-	background-color:grey;
-	color:white;
 }
 
 img{
@@ -244,4 +243,18 @@ body{
 }
 #f-forrst:hover p {
     color: #92c59c;
+}
+
+.champion-icon {
+	margin:2px 2px 2px 2px;
+    display:inline-block;
+    width:48px;
+    height:48px;
+    background-color: rgba(0, 0, 0,.7);
+	border: 1px solid black;
+    color:white;
+    -webkit-transition:all 0.2s ease;
+    -moz-transition:all 0.2s ease;
+    background-repeat:no-repeat;
+    text-decoration: none;
 }
