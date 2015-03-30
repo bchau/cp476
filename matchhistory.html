@@ -2,17 +2,21 @@
 
 	Summoner Name
 	<br />
-	<input id="userName" />
-	<br />
-	<br />Summoner Level: <span id="sLevel"></span>
-
-	<br />Summoner ID: <span id="sID"></span>
+	<input id="userName" class="input-box" onkeypress="return mhRunScript(event)"/>
 	<br />
 </div>
 
 <div id="post" >
-	<input type="submit" onclick="getMatchHistory();" value="Get Match History" />
+	<a href="#" onclick="getMatchHistory('all');" id="button-get-all" class="m-h-box">
+	<h5>Get All</h5></a>
+	<a href="#" onclick="getMatchHistory('fives');" id="button-ranked-5v5s" class="m-h-box">
+	<h5>Ranked 5v5's</h5></a>
+	<a href="#" onclick="getMatchHistory('threes');" id="button-ranked-3v3s" class="m-h-box">
+	<h5>Ranked 3v3's</h5></a>
+	<a href="#" onclick="getMatchHistory('solo');" id="button-ranked-solo" class="m-h-box">
+	<h5>Ranked Solo</h5></a>
 	<br>
-	<hr />
+	<br>
 	<table id="matchesAll"></table>
+	<div id="load-more"></div>
 </div>

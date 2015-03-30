@@ -1,6 +1,9 @@
 var ID = "";
 var APIKEY = "ef97109d-5c86-4467-a021-45c4d36fdf86";//"a202172b-de9e-497e-b13d-a0600e839d90";
 var champs = {};
+var summonerLevel = 0;
+var summonerID = 0;
+
 function summonerLookUp( ID) {
 	$.ajax({
 		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
@@ -14,8 +17,6 @@ function summonerLookUp( ID) {
 			
 			summonerLevel = json[userID].summonerLevel;
 			summonerID = json[userID].id;
-			document.getElementById("sLevel").innerHTML = summonerLevel;
-			document.getElementById("sID").innerHTML = summonerID;
 			return summonerID;
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -39,8 +40,6 @@ function getMasteries() {
 			
 			summonerLevel = json[userID].summonerLevel;
 			summonerID = json[userID].id;
-			document.getElementById("sLevel").innerHTML = summonerLevel;
-			document.getElementById("sID").innerHTML = summonerID;
 			return summonerID;
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -79,7 +78,15 @@ function getMasteries() {
 }
 
 
-function getMatchHistory(){
+function getMatchHistory(queue){
+	var filter = "";
+	switch(queue){
+		case 'fives': filter = "RANKED_TEAM_5x5"; break;
+		case 'threes': filter = "RANKED_TEAM_3x3";break;
+		case 'solo': filter = "RANKED_SOLO_5x5";break;
+		case 'all': break;
+	}
+	
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
 	$.when($.ajax({ //wait for response summoner
@@ -94,8 +101,6 @@ function getMatchHistory(){
 			
 			summonerLevel = json[userID].summonerLevel;
 			summonerID = json[userID].id;
-			document.getElementById("sLevel").innerHTML = summonerLevel;
-			document.getElementById("sID").innerHTML = summonerID;
 			return summonerID;
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -109,11 +114,12 @@ function getMatchHistory(){
 			type: 'GET',
 			dataType: 'json',
 			data: {
-			
+				'rankedQueues':filter
 			},
 			success:function (resp){
 				matches =resp['matches'];
-				document.getElementById("matchesAll").innerHTML = "</table>";
+				document.getElementById("matchesAll").innerHTML = "";
+				document.getElementById("load-more").innerHTML = '<br><br><a href="#" onclick="loadMore();" id="button-load-more" class="m-h-load-more-box"><h5>LOAD MORE</h5></a>';
 				matches.forEach(function (match) {
 						var stats = match.participants[0].stats;
 						var num = getChampionIconById(match.participants[0].championId);
@@ -321,4 +327,10 @@ function showMasteries(){
 			}
         });
 	 });
+}
+
+function mhRunScript(e) {
+    if (e.keyCode == 13) {
+		getMatchHistory('all');
+    }
 }
