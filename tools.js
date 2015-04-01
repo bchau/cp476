@@ -97,7 +97,7 @@ function getMatchHistory(queue){
 		case 'fives': filter = "RANKED_TEAM_5x5"; break;
 		case 'threes': filter = "RANKED_TEAM_3x3";break;
 		case 'solo': filter = "RANKED_SOLO_5x5";break;
-		default: break;
+		default: filter = ""; break;
 	}
 	
 	addLoadSpinner();
