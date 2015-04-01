@@ -4,7 +4,11 @@ var champs = {};
 var summonerLevel = 0;
 var summonerID = 0;
 var numRecords = 0;
+var filter = "";
 
+/*
+Retrieve Basic Player Info
+*/
 function summonerLookUp( ID) {
 	$.ajax({
 		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
@@ -26,6 +30,9 @@ function summonerLookUp( ID) {
 	});
 }
 
+/*
+Retrieve Player Masteries
+*/
 function getMasteries() {
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
@@ -78,13 +85,19 @@ function getMasteries() {
 		);
 }
 
-var filter = "";
+
+
+/*
+Retrieve 10 Match History records.
+Parameters:
+queue - RANKED_SOLO_5x5, RANKED_TEAM_3x3, RANKED_TEAM_5x5 or empty for all.
+*/
 function getMatchHistory(queue){
 	switch(queue){
 		case 'fives': filter = "RANKED_TEAM_5x5"; break;
 		case 'threes': filter = "RANKED_TEAM_3x3";break;
 		case 'solo': filter = "RANKED_SOLO_5x5";break;
-		case 'all': break;
+		default: break;
 	}
 	
 	addLoadSpinner();
@@ -137,17 +150,104 @@ function getMatchHistory(queue){
 	}});
 }
 
-//load spinner
+/*
+Retrieve Additional 10 Match History records appended to previous results.
+*/
+function loadMore(){
+	addLoadSpinner();
+	ID = document.getElementById("userName").value;
+	$.when($.ajax({ //wait for response summoner
+		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
+		type: 'GET',
+		dataType: 'json',
+		data: {
+
+		},
+		success: function (json) {
+			var userID = ID.replace(" ","").toLowerCase().trim();
+			
+			summonerLevel = json[userID].summonerLevel;
+			summonerID = json[userID].id;
+			return summonerID;
+		},
+		error: function (XMLHttpRequest, textStatus, errorThrown) {
+			removeLoadSpinner();
+			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
+		}
+	})).done( function(){
+		if (summonerID != 0){
+		$.ajax({
+			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
+			type: 'GET',
+			dataType: 'json',
+			data: {
+				'rankedQueues':filter, //previously selected
+				'beginIndex' :numRecords,
+				'endIndex':numRecords+9
+			},
+			success:function (resp){
+				matches =resp['matches'];
+				var temp = "";
+				$('#newData').remove();
+				matches.forEach(function(match){temp = compileMatchData(temp,match);});
+				document.getElementById("matchesAll").innerHTML = document.getElementById("matchesAll").innerHTML + temp + "<div id='newData' name='newData'></div>"; //properly append new data
+				removeLoadSpinner();
+				numRecords = numRecords+10;
+			},
+			error:function (XMLHttpRequest, textStatus, errorThrown){
+				removeLoadSpinner();
+				alert("error getting match history");
+				
+			}
+		});
+	}});
+}
+
+
+/*
+Parameters:
+temp - String to append data to
+match - Match JSON Object
+*/
+function compileMatchData(temp,match) {
+	var stats = match.participants[0].stats;
+	var num = getChampionIconById(match.participants[0].championId);
+	var size = 48;
+	var page = Math.floor(num/30);
+	var row = Math.floor((num%30)/10)*size;
+	var col = (num%10)*size;
+	temp = 
+	"<tr><td style='width:100px'>"+
+		"<a class='champion-icon' style='background-image:url(images/champion"+page+".png);background-position:-"+col+"px -"+row+"px;'></a>"+
+		"<br>ChampionId: " + match.participants[0].championId + 
+	"</td><td>"+
+		"Match ID: "+match.matchId + 
+		"<br>Queue Type: "+match.queueType+ 
+		"<br>MapId: "+ match.mapId+ 
+		"<br>KDA: " + stats.kills +"/" +stats.deaths+"/"+stats.assists +
+	"</td></tr>"+ temp;
+	return temp;
+}
+
+/*
+Add Load spinner
+*/
 function addLoadSpinner(){
 	$('#overlay').remove();
 	$("#center").append("<div id='overlay'><img src='loading.gif'></div>");
 
 }
 
+/*
+Remove Load spinner
+*/
 function removeLoadSpinner(){
 	$('#overlay').remove();
 }
 
+/*
+Image Icons. Setup champion ids  to match image resources.
+*/
 function getChampionIconById(ID){
 	if (champs[1] === undefined){
 		var page = 30;
@@ -279,6 +379,9 @@ function getChampionIconById(ID){
 	return champs[ID];
 }
 
+/*
+Dynamic: show Match History page
+*/
 function showMatchHistory(){
 	 $(document).ready(function() {
 	 $.ajax({
@@ -298,6 +401,18 @@ function showMatchHistory(){
 	 });
 }
 
+/*
+Match History search on Enter key
+*/
+function mhRunScript(e) {
+    if (e.keyCode == 13) {
+		getMatchHistory('all');
+    }
+}
+
+/*
+Dynamic: show Masteries page
+*/
 function showMasteries(){
 	$(document).ready(function() {
 	 $.ajax({
@@ -317,78 +432,3 @@ function showMasteries(){
 	 });
 }
 
-function mhRunScript(e) {
-    if (e.keyCode == 13) {
-		getMatchHistory('all');
-    }
-}
-
-function loadMore(){
-	addLoadSpinner();
-	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
-
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){
-		if (summonerID != 0){
-		$.ajax({
-			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
-			type: 'GET',
-			dataType: 'json',
-			data: {
-				'rankedQueues':filter, //previously selected
-				'beginIndex' :numRecords,
-				'endIndex':numRecords+9
-			},
-			success:function (resp){
-				matches =resp['matches'];
-				var temp = "";
-				$('#newData').remove();
-				matches.forEach(function(match){temp = compileMatchData(temp,match);});
-				document.getElementById("matchesAll").innerHTML = document.getElementById("matchesAll").innerHTML + temp + "<div id='newData' name='newData'></div>"; //properly append new data
-				removeLoadSpinner();
-				numRecords = numRecords+10;
-			},
-			error:function (XMLHttpRequest, textStatus, errorThrown){
-				removeLoadSpinner();
-				alert("error getting match history");
-				
-			}
-		});
-	}});
-}
-
-function compileMatchData(temp,match) {
-	var stats = match.participants[0].stats;
-	var num = getChampionIconById(match.participants[0].championId);
-	var size = 48;
-	var page = Math.floor(num/30);
-	var row = Math.floor((num%30)/10)*size;
-	var col = (num%10)*size;
-	temp = 
-	"<tr><td style='width:100px'>"+
-		"<a class='champion-icon' style='background-image:url(images/champion"+page+".png);background-position:-"+col+"px -"+row+"px;'></a>"+
-		"<br>ChampionId: " + match.participants[0].championId + 
-	"</td><td>"+
-		"Match ID: "+match.matchId + 
-		"<br>Queue Type: "+match.queueType+ 
-		"<br>MapId: "+ match.mapId+ 
-		"<br>KDA: " + stats.kills +"/" +stats.deaths+"/"+stats.assists +
-	"</td></tr>"+ temp;
-	return temp;
-}

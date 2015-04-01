@@ -19,19 +19,20 @@
 }
 
 .banner{
-	width:1250px;
+	width:897px;
 	margin:auto;
 	margin-top:1px;
 	margin-bottom:1px;
 	padding:1px;
 	color:white;
 	background-color: rgba(0,0,0,0.85);	
+	background-position-x: -100px;
     text-decoration: none;
 }
 
 .banner-box {
     display:inline-block;
-    width:1250px;
+    width:800px;
     height:auto;
     color:white;
     text-decoration: none;
@@ -246,7 +247,7 @@ footer{
 	  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0.3);
 	  opacity:.97; 
 	
-    background-position:0px 70px;
+    background-position-y: 70px;
 }
 
 
