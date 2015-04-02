@@ -435,7 +435,7 @@ function showMasteries(){
 /*
 Dynamic: show Current Game page
 */
-function showMasteries(){
+function showCurrentGame(){
 	$(document).ready(function() {
 	 $.ajax({
             url : "currentgame.html",
