@@ -432,3 +432,25 @@ function showMasteries(){
 	 });
 }
 
+/*
+Dynamic: show Current Game page
+*/
+function showMasteries(){
+	$(document).ready(function() {
+	 $.ajax({
+            url : "currentgame.html",
+			async: false,
+			dataType: 'html',
+			data: {
+			
+			},
+            success : function (data) {
+				$('#center').html(data);
+            },
+			error:function (){
+				alert("error: could not load masteries html");
+			}
+        });
+	 });
+}
+
