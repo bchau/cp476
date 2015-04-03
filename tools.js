@@ -31,6 +31,58 @@ function summonerLookUp( ID) {
 }
 
 /*
+current game
+*/
+function getCurrentGameInfo(){
+	addLoadSpinner();
+	ID = document.getElementById("userName").value;
+	$.when($.ajax({ //wait for response summoner
+		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
+		type: 'GET',
+		dataType: 'json',
+		data: {
+
+		},
+		success: function (json) {
+			var userID = ID.replace(" ","").toLowerCase().trim();
+			
+			summonerLevel = json[userID].summonerLevel;
+			summonerID = json[userID].id;
+			return summonerID;
+		},
+		error: function (XMLHttpRequest, textStatus, errorThrown) {
+			removeLoadSpinner();
+			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
+		}
+	})).done( function(){ //retrieve current game
+			if (summonerID != 0){
+				$.ajax({
+					url: "https://na.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/"+summonerID+"?api_key=" + APIKEY,
+					type: 'GET',
+					dataType: 'json',
+					crossdomain : true,
+					data: {
+						'Access-Control-Allow-Origin': 'https://developer.riotgames.com',
+						'Access-Control-Allow-Credentials': true
+					},
+					success: function (resp) {
+
+						
+						removeLoadSpinner();
+					},
+
+					error: function (XMLHttpRequest, textStatus, errorThrown) {
+						
+						alert("Error getting current game info!");
+						removeLoadSpinner();
+					}
+				});
+			}
+			});
+	
+}
+
+/*
 Retrieve Player Masteries
 */
 function getMasteries() {
@@ -411,12 +463,43 @@ function mhRunScript(e) {
 }
 
 /*
+current game on enter key
+*/
+function cgRunScript(e) {
+    if (e.keyCode == 13) {
+		getCurrentGameInfo();
+    }
+}
+
+/*
 Dynamic: show Masteries page
 */
 function showMasteries(){
 	$(document).ready(function() {
 	 $.ajax({
             url : "masteries.html",
+			async: false,
+			dataType: 'html',
+			data: {
+			
+			},
+            success : function (data) {
+				$('#center').html(data);
+            },
+			error:function (){
+				alert("error: could not load masteries html");
+			}
+        });
+	 });
+}
+
+/*
+Dynamic: show Current Game page
+*/
+function showCurrentGame(){
+	$(document).ready(function() {
+	 $.ajax({
+            url : "currentgame.html",
 			async: false,
 			dataType: 'html',
 			data: {
