@@ -1,8 +1,6 @@
 var ID = "";
 var APIKEY = "ef97109d-5c86-4467-a021-45c4d36fdf86";//"a202172b-de9e-497e-b13d-a0600e839d90";
 var champs = {};
-var summonerLevel = 0;
-var summonerID = 0;
 var numRecords = 0;
 var filter = "";
 
@@ -10,24 +8,27 @@ var filter = "";
 Retrieve Basic Player Info
 */
 function summonerLookUp( ID) {
+	var summonerID = 0;
 	$.ajax({
 		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
 		type: 'GET',
 		dataType: 'json',
+		async: false,
 		data: {
 
 		},
 		success: function (json) {
 			var userID = ID.replace(" ","").toLowerCase().trim();
 			
-			summonerLevel = json[userID].summonerLevel;
+
 			summonerID = json[userID].id;
-			return summonerID;
+			
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
 			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
 		}
 	});
+	return summonerID;
 }
 
 /*
@@ -36,50 +37,64 @@ current game
 function getCurrentGameInfo(){
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
+	var summonerID = summonerLookUp(ID);
+	if (summonerID != 0){
+		$.ajax({
+			url: "getCurrentGame.php?summonerID="+summonerID,
+			type: 'POST',
+			dataType: 'json',
+			data: {
+			},
+			success: function (resp) {
+				players =resp['participants'];
+				document.getElementById("currentGameInfo").innerHTML = "";
+				var temp = resp.gameId + "<br>";
+				players.forEach(function (player) {
+						temp = compilePlayerData(temp,player);
+						});
+				document.getElementById("currentGameInfo").innerHTML = temp;
+				removeLoadSpinner();
+			},
 
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){ //retrieve current game
-			if (summonerID != 0){
-				$.ajax({
-					url: "https://na.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/"+summonerID+"?api_key=" + APIKEY,
-					type: 'GET',
-					dataType: 'json',
-					crossdomain : true,
-					data: {
-						'Access-Control-Allow-Origin': 'https://developer.riotgames.com',
-						'Access-Control-Allow-Credentials': true
-					},
-					success: function (resp) {
-
-						
-						removeLoadSpinner();
-					},
-
-					error: function (XMLHttpRequest, textStatus, errorThrown) {
-						
-						alert("Error getting current game info!");
-						removeLoadSpinner();
-					}
-				});
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				
+				alert("Error getting current game info! ");
+				removeLoadSpinner();
 			}
-			});
-	
+		});
+	}
+}
+
+/*
+Parameters:
+temp - String to append data to
+player - Participant JSON Object
+*/
+function compilePlayerData(temp,player) {
+	/*var teamId = player.teamId
+	var num = getChampionIconById(match.participants[0].championId);
+	var size = 48;
+	var page = Math.floor(num/30);
+	var row = Math.floor((num%30)/10)*size;
+	var col = (num%10)*size;
+	temp = 
+	"<tr><td style='width:100px'>"+
+		"<a class='champion-icon' style='background-image:url(images/champion"+page+".png);background-position:-"+col+"px -"+row+"px;'></a>"+
+		"<br>ChampionId: " + match.participants[0].championId + 
+	"</td><td>"+
+		"Match ID: "+match.matchId + 
+		"<br>Queue Type: "+match.queueType+ 
+		"<br>MapId: "+ match.mapId+ 
+		"<br>KDA: " + stats.kills +"/" +stats.deaths+"/"+stats.assists +
+	"</td></tr>"+ temp;*/
+	temp = player.teamId+"<br>"
+	+player.spell1Id+"<br>"
+	+player.spell2Id+"<br>"
+	+player.championId+"<br>"
+	+player.summonerName+"<br>"
+	+player.bot+"<br><br>"
+	+temp;
+	return temp;
 }
 
 /*
@@ -88,53 +103,34 @@ Retrieve Player Masteries
 function getMasteries() {
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
+	var summonerID = summonerLookUp(ID);
+	if (summonerID != 0){
+		$.ajax({
+			url: "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + summonerID + "/masteries?api_key=" + APIKEY,
+			type: 'GET',
+			dataType: 'json',
+			data: {
 
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){ //retrieve masteries
-			if (summonerID != 0){
-				$.ajax({
-					url: "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + summonerID + "/masteries?api_key=" + APIKEY,
-					type: 'GET',
-					dataType: 'json',
-					data: {
-
-					},
-					success: function (resp) {
-						numberOfPages = resp[summonerID].pages.length;            
-						document.getElementById("masteryPagesCount").innerHTML = numberOfPages;
-						document.getElementById("masteryPagesAll").innerHTML = "";
-						resp[summonerID].pages.forEach(function (item) {
-						document.getElementById("masteryPagesAll").innerHTML = document.getElementById("masteryPagesAll").innerHTML + item.name + "<br />";
-						});
-						
-						removeLoadSpinner();
-					},
-
-					error: function (XMLHttpRequest, textStatus, errorThrown) {
-						
-						alert("error getting Summoner data2!");
-						removeLoadSpinner();
-					}
+			},
+			success: function (resp) {
+				numberOfPages = resp[summonerID].pages.length;            
+				document.getElementById("masteryPagesCount").innerHTML = numberOfPages;
+				document.getElementById("masteryPagesAll").innerHTML = "";
+				resp[summonerID].pages.forEach(function (item) {
+				document.getElementById("masteryPagesAll").innerHTML = document.getElementById("masteryPagesAll").innerHTML + item.name + "<br />";
 				});
+				
+				removeLoadSpinner();
+			},
+
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				
+				alert("error getting Summoner data2!");
+				removeLoadSpinner();
 			}
-		}
-		);
+		});
+	}
+		
 }
 
 
@@ -154,26 +150,8 @@ function getMatchHistory(queue){
 	
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
-
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){ //summoner match history
-		if (summonerID != 0){
+	var summonerID = summonerLookUp(ID);
+	if (summonerID != 0){
 		$.ajax({
 			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
 			type: 'GET',
@@ -199,7 +177,8 @@ function getMatchHistory(queue){
 				
 			}
 		});
-	}});
+	}
+
 }
 
 /*
@@ -208,26 +187,8 @@ Retrieve Additional 10 Match History records appended to previous results.
 function loadMore(){
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
-
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){
-		if (summonerID != 0){
+	var summonerID = summonerLookUp(ID);
+	if (summonerID != 0){
 		$.ajax({
 			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
 			type: 'GET',
@@ -252,7 +213,7 @@ function loadMore(){
 				
 			}
 		});
-	}});
+	}
 }
 
 
@@ -440,9 +401,7 @@ function showMatchHistory(){
             url : "matchhistory.html",
 			async: false,
 			dataType: 'html',
-			data: {
-			
-			},
+			data: {},
             success : function (data) {
 				$('#center').html(data);
             },
@@ -459,15 +418,6 @@ Match History search on Enter key
 function mhRunScript(e) {
     if (e.keyCode == 13) {
 		getMatchHistory('all');
-    }
-}
-
-/*
-current game on enter key
-*/
-function cgRunScript(e) {
-    if (e.keyCode == 13) {
-		getCurrentGameInfo();
     }
 }
 
@@ -515,3 +465,11 @@ function showCurrentGame(){
 	 });
 }
 
+/*
+current game on enter key
+*/
+function cgRunScript(e) {
+    if (e.keyCode == 13) {
+		getCurrentGameInfo();
+    }
+}
