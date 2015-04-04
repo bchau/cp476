@@ -3,9 +3,13 @@
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="tools.js"></script>
+
 <head>
 <meta charset="UTF-8">
 <title>Bryan Chau - Playground</title>
+
+<!-- Startup configuration -->
+<link rel="manifest" href="manifest.json">
 </head>
 
 <body>
@@ -29,37 +33,10 @@
 		  
 	<!-- CENTER PAGE CONTENT-->
 	<div id = "center" class="clearfix page-wrap">
-		<!--
-		<div>
-			<br><br>
-			CP476 Final Project Proposal <br>
-			Edward Huang 100949380<br>
-			Bryan Chau 110663120<br>
-			<hr><br>
-		</div>
 		
-		<div>
-			<p>Our final project will be a web page that pulls data from a game server using their API. The game in question is League of Legends and the Riot games API.  We will be pulling data from the API that comes in as Json and then parsing thru that data using PHP to do calculations on the server side with this new information that is stored on the server using MySQL. 
-			<br><br>There are many sites that offer in game data for the League of Legends but there isn’t one for the data that we want to be able to see, our solution is a web page that will output this for us and for all our friends to use as well.
-			<br><br>The web page will have several applications using the various elements received in the Json and it will be made in JavaScript.  One of the applications is the trending data, it keeps track of the stats of players over the course of the last 10 games and the result is outputted to the user when the request is made for a player of a certain region.  To show this in the web page, we show the current game info and apply the trending data to them to show it as a stat for them. The idea is to give other players a feel for the play style of their opponents as well as an understanding for their own play over the course of their last 10 games. If we come up with other applications using the various data then they will be implemented as well
-			<br><br>We will be using their images on our page as well as their logos. The user interface will have a form to take in the username and the realm the user is on. All information will be displayed on one page dynamically. When the information is requested by the user, the div will show it in a 5 by 2 grid with a box for each of the 10 players and stats for each of them for the current game.
-			<br><br>On the web page, there will a tracker to show players any updates or bugs in the current build of the game and will update live based on changes done by Riot.
-			<br><br>The schedule is as follows: For the first week, we will be analyzing the API and seeing which Json objects that we will be pulling from their server and understanding how to use and manipulate them for our needs. The second week is making the web page and implementing all the bases for the MySQL, JavaScript and PHP. Then refining it to make it look pretty and run efficiently. The last week is fine tuning and checking for any bugs that can occur with the web page.
-			</p>
-
-		</div>
-		-->
-		<div id="post" >
-
-			Summoner Name
-			<br />
-			<input id="userName" class="input-box" onkeypress="return cgRunScript(event)"/>
-			<br />
-		</div>
-
-		<div id="post" >
-
-		</div>
+		<script>
+			showCurrentGame();
+		</script>
 	</div>
 	
 	<!-- FOOTER-->

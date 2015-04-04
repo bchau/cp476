@@ -520,6 +520,7 @@ function getChampionNameById(ID){
 		champnames[432] = "bard";
 	}
 	return capitalizeFirstLetter(champnames[ID]);
+
 }
 
 function getSummonerSkillIconById(ID){
@@ -614,8 +615,11 @@ function cgRunScript(e) {
     if (e.keyCode == 13) {
 		getCurrentGameInfo();
     }
+<<<<<<< HEAD
 }
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
+=======
+>>>>>>> ceccf9670759920f76de4cfe08e807537b108160
 }
