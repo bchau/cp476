@@ -1,8 +1,7 @@
 var ID = "";
 var APIKEY = "ef97109d-5c86-4467-a021-45c4d36fdf86";//"a202172b-de9e-497e-b13d-a0600e839d90";
 var champs = {};
-var summonerLevel = 0;
-var summonerID = 0;
+var champnames = {};
 var numRecords = 0;
 var filter = "";
 
@@ -10,24 +9,27 @@ var filter = "";
 Retrieve Basic Player Info
 */
 function summonerLookUp( ID) {
+	var summonerID = 0;
 	$.ajax({
 		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
 		type: 'GET',
 		dataType: 'json',
+		async: false,
 		data: {
 
 		},
 		success: function (json) {
 			var userID = ID.replace(" ","").toLowerCase().trim();
 			
-			summonerLevel = json[userID].summonerLevel;
+
 			summonerID = json[userID].id;
-			return summonerID;
+			
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
 			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
 		}
 	});
+	return summonerID;
 }
 
 /*
@@ -36,50 +38,64 @@ current game
 function getCurrentGameInfo(){
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
+	var summonerID = summonerLookUp(ID);
+	if (summonerID != 0){
+		$.ajax({
+			url: "getCurrentGame.php?summonerID="+summonerID,
+			type: 'POST',
+			dataType: 'json',
+			data: {
+			},
+			success: function (resp) {
+				players =resp['participants'];
+				document.getElementById("currentGameInfo").innerHTML = "";
+				
+				temp = compilePlayerData(players);
 
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){ //retrieve current game
-			if (summonerID != 0){
-				$.ajax({
-					url: "https://na.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/"+summonerID+"?api_key=" + APIKEY,
-					type: 'GET',
-					dataType: 'json',
-					crossdomain : true,
-					data: {
-						'Access-Control-Allow-Origin': 'https://developer.riotgames.com',
-						'Access-Control-Allow-Credentials': true
-					},
-					success: function (resp) {
+				document.getElementById("currentGameInfo").innerHTML = temp;
+				removeLoadSpinner();
+			},
 
-						
-						removeLoadSpinner();
-					},
-
-					error: function (XMLHttpRequest, textStatus, errorThrown) {
-						
-						alert("Error getting current game info!");
-						removeLoadSpinner();
-					}
-				});
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				
+				alert("Error getting current game info! ");
+				removeLoadSpinner();
 			}
-			});
+		});
+	}
+}
+
+/*
+Parameters:
+temp - String to append data to
+players - Participants JSON Object
+*/
+function compilePlayerData(players) {
+	var temp = "<table class='current-game-table'>";
+	var sTeam1 = "<tr class='current-game-row'>";
+	var sTeam2 = "<tr class='current-game-row'>";
+	players.forEach(function (player) {
+		
+		if (player.teamId == 100){
+			sTeam1 = compileTeamData(sTeam1,player);
+		}
+		else{
+			sTeam2 = compileTeamData(sTeam2,player);
+		}
+	});
+	sTeam1 = sTeam1 +"</tr>"; 
+	sTeam2 = sTeam2 +"</tr>";
+	temp = temp+ sTeam1 + sTeam2 +"</table>";
+	return temp;
+}
+
+function compileTeamData(s,player){
+	s = s + "<td>"+player.spell1Id+" :Spell1<br>"
+	+player.spell2Id+" :Spell2<br>"
+	+"<a class='champion-portrait' style='background-image:url(images/champions/"+getChampionNameById(player.championId)+"_0.jpg)'>"
+	+player.summonerName+"</a></td>";
 	
+	return s;
 }
 
 /*
@@ -88,53 +104,34 @@ Retrieve Player Masteries
 function getMasteries() {
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
+	var summonerID = summonerLookUp(ID);
+	if (summonerID != 0){
+		$.ajax({
+			url: "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + summonerID + "/masteries?api_key=" + APIKEY,
+			type: 'GET',
+			dataType: 'json',
+			data: {
 
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){ //retrieve masteries
-			if (summonerID != 0){
-				$.ajax({
-					url: "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + summonerID + "/masteries?api_key=" + APIKEY,
-					type: 'GET',
-					dataType: 'json',
-					data: {
-
-					},
-					success: function (resp) {
-						numberOfPages = resp[summonerID].pages.length;            
-						document.getElementById("masteryPagesCount").innerHTML = numberOfPages;
-						document.getElementById("masteryPagesAll").innerHTML = "";
-						resp[summonerID].pages.forEach(function (item) {
-						document.getElementById("masteryPagesAll").innerHTML = document.getElementById("masteryPagesAll").innerHTML + item.name + "<br />";
-						});
-						
-						removeLoadSpinner();
-					},
-
-					error: function (XMLHttpRequest, textStatus, errorThrown) {
-						
-						alert("error getting Summoner data2!");
-						removeLoadSpinner();
-					}
+			},
+			success: function (resp) {
+				numberOfPages = resp[summonerID].pages.length;            
+				document.getElementById("masteryPagesCount").innerHTML = numberOfPages;
+				document.getElementById("masteryPagesAll").innerHTML = "";
+				resp[summonerID].pages.forEach(function (item) {
+				document.getElementById("masteryPagesAll").innerHTML = document.getElementById("masteryPagesAll").innerHTML + item.name + "<br />";
 				});
+				
+				removeLoadSpinner();
+			},
+
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				
+				alert("error getting Summoner data2!");
+				removeLoadSpinner();
 			}
-		}
-		);
+		});
+	}
+		
 }
 
 
@@ -154,26 +151,8 @@ function getMatchHistory(queue){
 	
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
-
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){ //summoner match history
-		if (summonerID != 0){
+	var summonerID = summonerLookUp(ID);
+	if (summonerID != 0){
 		$.ajax({
 			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
 			type: 'GET',
@@ -199,7 +178,8 @@ function getMatchHistory(queue){
 				
 			}
 		});
-	}});
+	}
+
 }
 
 /*
@@ -208,26 +188,8 @@ Retrieve Additional 10 Match History records appended to previous results.
 function loadMore(){
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
-	$.when($.ajax({ //wait for response summoner
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
-		type: 'GET',
-		dataType: 'json',
-		data: {
-
-		},
-		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
-			
-			summonerLevel = json[userID].summonerLevel;
-			summonerID = json[userID].id;
-			return summonerID;
-		},
-		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			removeLoadSpinner();
-			window.alert("Sorry we had trouble finding the entered summoner name!\n"+errorThrown);
-		}
-	})).done( function(){
-		if (summonerID != 0){
+	var summonerID = summonerLookUp(ID);
+	if (summonerID != 0){
 		$.ajax({
 			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
 			type: 'GET',
@@ -252,7 +214,7 @@ function loadMore(){
 				
 			}
 		});
-	}});
+	}
 }
 
 
@@ -286,7 +248,7 @@ Add Load spinner
 */
 function addLoadSpinner(){
 	$('#overlay').remove();
-	$("#center").append("<div id='overlay'><img src='loading.gif'></div>");
+	$("#center").append("<div id='overlay' ><img src='loading.gif' ></div>");
 
 }
 
@@ -431,6 +393,146 @@ function getChampionIconById(ID){
 	return champs[ID];
 }
 
+function getChampionNameById(ID){
+	if (champnames[1] === undefined){
+		champnames[1] = "annie";
+		champnames[2] = "olaf";
+		champnames[3] = "galio";
+		champnames[4] = "twistedfate";
+		champnames[5] = "xinzhao";
+		champnames[6] = "urgot";
+		champnames[7] = "leblanc";
+		champnames[8] = "vladimir";
+		champnames[9] = "fiddlesticks";
+		champnames[10] = "kayle";
+		champnames[11] = "masteryi";
+		champnames[12] = "alistar";
+		champnames[13] = "ryze";
+		champnames[14] = "sion";
+		champnames[15] = "sivir";
+		champnames[16] = "soraka";
+		champnames[17] = "teemo";
+		champnames[18] = "tristana";
+		champnames[19] = "warwick";
+		champnames[20] = "nunu";
+		champnames[21] = "missfortune";
+		champnames[22] = "ashe";
+		champnames[23] = "tryndamere";
+		champnames[24] = "jax";
+		champnames[25] = "morgana";
+		champnames[27] = "singed";
+		champnames[28] = "evelynn";
+		champnames[29] = "twitch";
+		champnames[30] = "karthus";
+		champnames[31] = "chogath";
+		champnames[32] = "amumu";
+		champnames[33] = "rammus";
+		champnames[34] = "anivia";
+		champnames[35] = "shaco";
+		champnames[36] = "DrMundo";
+		champnames[37] = "sona";
+		champnames[38] = "kassadin";
+		champnames[39] = "irelia";
+		champnames[40] = "janna";
+		champnames[41] = "gangplank";
+		champnames[42] = "corki";
+		champnames[43] = "karma";
+		champnames[44] = "taric";
+		champnames[45] = "veigar";
+		champnames[48] = "trundle";
+		champnames[50] = "swain";
+		champnames[51] = "caitlyn";
+		champnames[53] = "blitzcrank";
+		champnames[54] = "malphite";
+		champnames[55] = "katarina";
+		champnames[56] = "nocturne";
+		champnames[57] = "maokai";
+		champnames[58] = "renekton";
+		champnames[59] = "jarvanIV";
+		champnames[60] = "elise";
+		champnames[61] = "orianna";
+		champnames[62] = "wukong";
+		champnames[63] = "brand";
+		champnames[64] = "leesin";
+		champnames[67] = "vayne";
+		champnames[68] = "rumble";
+		champnames[69] = "cassiopeia";
+		champnames[72] = "skarner";
+		champnames[74] = "heimerdinger";
+		champnames[75] = "nasus";
+		champnames[76] = "nidalee";
+		champnames[77] = "udyr";
+		champnames[78] = "poppy";
+		champnames[79] = "gragas";
+		champnames[80] = "pantheon";
+		champnames[81] = "ezreal";
+		champnames[82] = "mordekaiser";
+		champnames[83] = "yorick";
+		champnames[84] = "akali";
+		champnames[85] = "kennen";
+		champnames[86] = "garen";
+		champnames[89] = "leona";
+		champnames[90] = "malzahar";
+		champnames[91] = "talon";
+		champnames[92] = "riven";
+		champnames[96] = "kogmaw";
+		champnames[98] = "shen";
+		champnames[99] = "lux";
+		champnames[101] = "xerath";
+		champnames[102] = "shyvana";
+		champnames[103] = "ahri";
+		champnames[104] = "graves";
+		champnames[105] = "fizz";
+		champnames[106] = "volibear";
+		champnames[107] = "rengar";
+		champnames[110] = "varus";
+		champnames[111] = "nautilus";
+		champnames[112] = "viktor";
+		champnames[113] = "sejuani";
+		champnames[114] = "fiora";
+		champnames[115] = "ziggs";
+		champnames[117] = "lulu";
+		champnames[119] = "draven";
+		champnames[120] = "hecarim";
+		champnames[121] = "khazix";
+		champnames[122] = "darius";
+		champnames[126] = "jayce";
+		champnames[127] = "lissandra";
+		champnames[133] = "quinn";
+		champnames[134] = "syndra";
+		champnames[131] = "diana";
+		champnames[143] = "zyra";
+		champnames[150] = "gnar";
+		champnames[154] = "zac";
+		champnames[157] = "yasuo";
+		champnames[161] = "velkoz";
+		champnames[201] = "braum";
+		champnames[222] = "jinx";
+		champnames[236] = "lucian";
+		champnames[238] = "zed";
+		champnames[254] = "vi";
+		champnames[266] = "aatrox";
+		champnames[267] = "nami";
+		champnames[268] = "azir";
+		champnames[412] = "thresh";
+		champnames[421] = "RekSai";
+		champnames[429] = "kalista";
+		champnames[432] = "bard";
+	}
+	return capitalizeFirstLetter(champnames[ID]);
+}
+
+function getSummonerSkillIconById(ID){
+	if (summonerskills[1] === undefined){
+		summonerskills[4] = "smite";
+		summonerskills[7] = "heal";
+		summonerskills[3] = "exhaust";
+		summonerskills[12] = "teleport";
+		summonerskills[11] = "smite";
+	}
+	return summonerskills[ID];
+}
+
 /*
 Dynamic: show Match History page
 */
@@ -440,9 +542,7 @@ function showMatchHistory(){
             url : "matchhistory.html",
 			async: false,
 			dataType: 'html',
-			data: {
-			
-			},
+			data: {},
             success : function (data) {
 				$('#center').html(data);
             },
@@ -459,15 +559,6 @@ Match History search on Enter key
 function mhRunScript(e) {
     if (e.keyCode == 13) {
 		getMatchHistory('all');
-    }
-}
-
-/*
-current game on enter key
-*/
-function cgRunScript(e) {
-    if (e.keyCode == 13) {
-		getCurrentGameInfo();
     }
 }
 
@@ -515,3 +606,16 @@ function showCurrentGame(){
 	 });
 }
 
+/*
+current game on enter key
+*/
+function cgRunScript(e) {
+
+    if (e.keyCode == 13) {
+		getCurrentGameInfo();
+    }
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
