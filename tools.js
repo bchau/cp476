@@ -2,6 +2,7 @@ var ID = "";
 var APIKEY = "ef97109d-5c86-4467-a021-45c4d36fdf86";//"a202172b-de9e-497e-b13d-a0600e839d90";
 var champs = {};
 var champnames = {};
+var summonerskills = {};
 var numRecords = 0;
 var filter = "";
 
@@ -67,7 +68,6 @@ function getCurrentGameInfo(){
 
 /*
 Parameters:
-temp - String to append data to
 players - Participants JSON Object
 */
 function compilePlayerData(players) {
@@ -90,10 +90,17 @@ function compilePlayerData(players) {
 }
 
 function compileTeamData(s,player){
-	s = s + "<td>"+player.spell1Id+" :Spell1<br>"
-	+player.spell2Id+" :Spell2<br>"
-	+"<a class='champion-portrait' style='background-image:url(images/champions/"+getChampionNameById(player.championId)+"_0.jpg)'>"
-	+player.summonerName+"</a></td>";
+	var border = "purple-border";
+	if (player.teamId == 100){
+		border = "blue-border";
+	}
+	
+	s = s + "<td>"
+	+"<a class='champion-portrait "+border+"' style='marginBottom:5px; background-image:url(images/champions/"+getChampionNameById(player.championId)+"_0.jpg)'>"
+	+player.summonerName+"<br>"
+	+"<div class='summoner-spell-icon' style='background-image:url(images/spells/"+getSummonerSkillIconById(player.spell1Id)+".png)'></div>"
+	+"<br><div class='summoner-spell-icon' style='background-image:url(images/spells/"+getSummonerSkillIconById(player.spell2Id)+".png)'></div>"
+	+"</a></td>";
 	
 	return s;
 }
@@ -398,7 +405,7 @@ function getChampionNameById(ID){
 		champnames[1] = "annie";
 		champnames[2] = "olaf";
 		champnames[3] = "galio";
-		champnames[4] = "twistedfate";
+		champnames[4] = "TwistedFate";
 		champnames[5] = "xinzhao";
 		champnames[6] = "urgot";
 		champnames[7] = "leblanc";
@@ -415,7 +422,7 @@ function getChampionNameById(ID){
 		champnames[18] = "tristana";
 		champnames[19] = "warwick";
 		champnames[20] = "nunu";
-		champnames[21] = "missfortune";
+		champnames[21] = "MissFortune";
 		champnames[22] = "ashe";
 		champnames[23] = "tryndamere";
 		champnames[24] = "jax";
@@ -453,7 +460,7 @@ function getChampionNameById(ID){
 		champnames[61] = "orianna";
 		champnames[62] = "wukong";
 		champnames[63] = "brand";
-		champnames[64] = "leesin";
+		champnames[64] = "LeeSin";
 		champnames[67] = "vayne";
 		champnames[68] = "rumble";
 		champnames[69] = "cassiopeia";
@@ -525,11 +532,18 @@ function getChampionNameById(ID){
 
 function getSummonerSkillIconById(ID){
 	if (summonerskills[1] === undefined){
-		summonerskills[4] = "smite";
-		summonerskills[7] = "heal";
-		summonerskills[3] = "exhaust";
-		summonerskills[12] = "teleport";
-		summonerskills[11] = "smite";
+		summonerskills[1] = "Boost";
+		summonerskills[2] = "Clairvoyance";
+		summonerskills[3] = "Exhaust";
+		summonerskills[4] = "Flash";
+		summonerskills[6] = "Ghost";
+		summonerskills[7] = "Heal";
+		summonerskills[11] = "Smite";
+		summonerskills[10] = "Revive";
+		summonerskills[12] = "Teleport";
+		summonerskills[14] = "Ignite";
+		summonerskills[17] = "Garrison";
+		summonerskills[21] = "Barrier";
 	}
 	return summonerskills[ID];
 }
@@ -615,11 +629,8 @@ function cgRunScript(e) {
     if (e.keyCode == 13) {
 		getCurrentGameInfo();
     }
-<<<<<<< HEAD
 }
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
-=======
->>>>>>> ceccf9670759920f76de4cfe08e807537b108160
 }
