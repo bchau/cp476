@@ -1,3 +1,11 @@
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
 .input-text{
 	font: bold 20px Sans-Serif !important;
@@ -27,7 +35,7 @@
 }
 
 .banner{
-	width:1800px;
+	width:1240px;
 	margin:auto;
 	margin-top:1px;
 	margin-bottom:1px;
@@ -117,7 +125,7 @@
     background-color: rgba(255,102,0,1);
 }
 
-.m-h-box {
+.m-h-box, .c-g-box {
     display:inline-block;
     width:135px;
     height:30px;
@@ -127,7 +135,48 @@
     text-decoration: none;
 }
 
-.m-h-box h5 {
+.c-g-box{
+	width:267px;
+	margin-left:5px;
+	text-align:center;
+}
+
+.c-g-center{  
+  display: table;
+  width: initial;
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+
+.c-g-mid{
+	background-color : rgba(0,0,0,0);
+}
+.c-g-mid:hover{
+	background-color : rgba(0,0,0,0);
+}
+
+.c-g-mid-box{  
+  text-align: center;
+  font: bold 14px Sans-Serif !important;
+  color: white;
+  text-shadow: 0.1em 0.1em 0.1em black;
+}
+
+.c-g-info-box-title {
+  width: 100%;
+  font: Bold 17px Sans-Serif !important;
+  text-decoration: underline;
+}
+
+.c-g-info-box {
+  width: 95%;
+  background-color: rgba(0,0,0,0.5);
+  text-align: left;
+  font: 17px Sans-Serif !important;
+  padding-left: 5%;
+}
+
+.m-h-box h5, .c-g-box h5 {
     font: bold 14px Sans-Serif !important;
     text-transform:uppercase;
     font-size:38px;
@@ -196,7 +245,6 @@
     width:48px;
     height:48px;
     background-color: rgba(0, 0, 0,.7);
-	border: 1px solid black;
     color:white;
     -webkit-transition:all 0.2s ease;
     -moz-transition:all 0.2s ease;
@@ -282,7 +330,7 @@ footer{
 
 #center {
 	top:5px;
-	width:1770px;
+	width:1210px;
 	position: relative;
 	padding-left:15px;
 	padding-right:15px;

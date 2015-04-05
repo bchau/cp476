@@ -6,7 +6,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>Bryan Chau - Playground</title>
+<title>LOL - Tilt checker</title>
 
 <!-- Startup configuration -->
 <link rel="manifest" href="manifest.json">
@@ -15,7 +15,7 @@
 <body>
 	<!-- HEADER-->
 	<div id = "north" class="banner">
-		<a href="index.html" class = "banner-box"><h1>RIOT API</h1></a>
+		<a href="index.html" class = "banner-box"><h1>ARE YOU ON TILT?</h1></a>
 		
 	</div>
 
@@ -32,8 +32,16 @@
 	
 		  
 	<!-- CENTER PAGE CONTENT-->
-	<div id = "center" class="clearfix page-wrap">
-		
+	<div id="center" class="clearfix page-wrap">
+		<div id="post" >
+
+			<a class="input-text">Enter a Summoner Name: </a>
+			<br />
+			<input id="userName" class="input-box" maxlength="16" onkeypress="return cgRunScript(event)"/>
+			<br />
+		</div>
+		<div id="output">
+		</div>
 		<script>
 			showCurrentGame();
 		</script>
@@ -41,7 +49,7 @@
 	
 	<!-- FOOTER-->
 	<div id = "south" class="banner">
-		<a class = "banner-box"><footer><h6>© Bryan Chau - CopyRight 2015</h6></footer></a>
+		<a class = "banner-box"><footer><h6>© Bryan Chau, Edward Huang - CopyRight 2015</h6></footer></a>
 	</div>
 </body>
 

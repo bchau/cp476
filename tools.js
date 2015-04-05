@@ -1,18 +1,33 @@
 var ID = "";
-var APIKEY = "ef97109d-5c86-4467-a021-45c4d36fdf86";//"a202172b-de9e-497e-b13d-a0600e839d90";
+var APIKEY = "a202172b-de9e-497e-b13d-a0600e839d90"; //"ef97109d-5c86-4467-a021-45c4d36fdf86"
 var champs = {};
 var champnames = {};
 var summonerskills = {};
+var mapnames = {};
+var gamemode ={};
 var numRecords = 0;
 var filter = "";
+var keyCount = 0;
 
-/*
-Retrieve Basic Player Info
-*/
+//bypass api key restrictions (temporary)
+function getAPIKey(){
+	var result = "";
+	switch(keyCount){
+		case 0: result = "a202172b-de9e-497e-b13d-a0600e839d90"; break;
+		case 1: result = "ef97109d-5c86-4467-a021-45c4d36fdf86"; break;
+		case 2: result = "c9906c39-e8bf-4499-bc13-9b27431d1379"; break;
+		case 3: result = "cc758690-fdd7-49b8-9f31-6ea3a6a167f9"; break;
+		case 4: result = "673e2d9b-e252-4416-b0d5-79f7fc29ebc0"; break;
+	}
+	keyCount = (keyCount+1)%5;
+	return result;
+}
+
+//find summoner basic info
 function summonerLookUp( ID) {
 	var summonerID = 0;
 	$.ajax({
-		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + APIKEY,
+		url: 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/' + ID + '?api_key=' + getAPIKey(),
 		type: 'GET',
 		dataType: 'json',
 		async: false,
@@ -20,7 +35,7 @@ function summonerLookUp( ID) {
 
 		},
 		success: function (json) {
-			var userID = ID.replace(" ","").toLowerCase().trim();
+			var userID = replaceAll(" ","",ID).toLowerCase().trim();
 			
 
 			summonerID = json[userID].id;
@@ -33,9 +48,7 @@ function summonerLookUp( ID) {
 	return summonerID;
 }
 
-/*
-current game
-*/
+//get current game info
 function getCurrentGameInfo(){
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
@@ -51,7 +64,7 @@ function getCurrentGameInfo(){
 				players =resp['participants'];
 				document.getElementById("currentGameInfo").innerHTML = "";
 				
-				temp = compilePlayerData(players);
+				temp = compileGameData(resp) + compilePlayerData(resp);
 
 				document.getElementById("currentGameInfo").innerHTML = temp;
 				removeLoadSpinner();
@@ -66,11 +79,18 @@ function getCurrentGameInfo(){
 	}
 }
 
-/*
-Parameters:
-players - Participants JSON Object
-*/
-function compilePlayerData(players) {
+function compileGameData(data){
+	var temp = "<div class='c-g-center'>"
+	+"<div class='c-g-box'><h5>Game mode: "+getGameModeById(data.gameQueueConfigId) + "</h5></div>"
+	+"<div class='c-g-box'><h5>Game type: "+data.gameType +"</h5></div>"
+	+"<div class='c-g-box'><h5>Map: "+getMapNameById(data.mapId) +"</h5></div>"
+	+"<div class='c-g-box' id='gameTime' startTime='"+data.gameStartTime+"'><h5>Game Time: "+ elapsedTime(data.gameStartTime) +"</h5></div></div>";
+	return temp;
+}
+
+
+function compilePlayerData(data) {
+	var players = data['participants'];
 	var temp = "<table class='current-game-table'>";
 	var sTeam1 = "<tr class='current-game-row'>";
 	var sTeam2 = "<tr class='current-game-row'>";
@@ -85,7 +105,57 @@ function compilePlayerData(players) {
 	});
 	sTeam1 = sTeam1 +"</tr>"; 
 	sTeam2 = sTeam2 +"</tr>";
-	temp = temp+ sTeam1 + sTeam2 +"</table>";
+	
+	var bans = data['bannedChampions'];
+	var sBans = "<tr><td>";
+	var ban1 = "";
+	var ban2 = "";
+	var ban3 = "";
+	var ban4 = "";
+	var ban5 = "";
+	var ban6 = "";
+	bans.forEach(function(ban){
+		
+		var num = getChampionIconById(ban.championId);
+		var size = 48;
+		var page = Math.floor(num/30);
+		var row = Math.floor((num%30)/10)*size;
+		var col = (num%10)*size;
+			
+		switch(ban.pickTurn){
+			case 1: ban1 = "<a class='champion-icon blue-border' style='background-image:url(images/champion"+page
+			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
+			break;
+			case 2: ban2 = "<a class='champion-icon purple-border' style='background-image:url(images/champion"+page
+			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
+			break;
+			case 3: ban3 = "<a class='champion-icon blue-border' style='background-image:url(images/champion"+page
+			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
+			break;
+			case 4: ban4 = "<a class='champion-icon purple-border' style='background-image:url(images/champion"+page
+			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
+			break;
+			case 5: ban5 = "<a class='champion-icon blue-border' style='background-image:url(images/champion"+page
+			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
+			break;
+			case 6: ban6 = "<a class='champion-icon purple-border' style='background-image:url(images/champion"+page
+			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
+			break;
+			default:
+			break;
+		}
+	});
+	var sBans = "";
+	if(bans.length != 0){
+		sBans = "<tr class='c-g-mid'><td class='c-g-mid-box'> BLUE SIDE BANS: <br>"+ban1+ban3+ban5
+		+"</td><td class='c-g-mid-box'></td><td class='c-g-mid-box'>VS</td><td class='c-g-mid-box'></td><td class='c-g-mid-box'>"
+		+"PURPLE SIDE BANS: <br>"+ban2+ban4+ban6+"</td></tr>";
+	}else{
+		sBans = "<tr class='c-g-mid'><td class='c-g-mid-box'>"
+		+"</td><td class='c-g-mid-box'></td><td class='c-g-mid-box'>VS</td><td class='c-g-mid-box'></td><td class='c-g-mid-box'>"
+		+"</td></tr>";
+	}
+	temp = temp+ sTeam1 +sBans+ sTeam2 +"</table>";
 	return temp;
 }
 
@@ -100,14 +170,189 @@ function compileTeamData(s,player){
 	+player.summonerName+"<br>"
 	+"<div class='summoner-spell-icon' style='background-image:url(images/spells/"+getSummonerSkillIconById(player.spell1Id)+".png)'></div>"
 	+"<br><div class='summoner-spell-icon' style='background-image:url(images/spells/"+getSummonerSkillIconById(player.spell2Id)+".png)'></div>"
+	+"<br>"+getPlayerStatsChampion(player.summonerId,player.championId)
+	+getPlayerStats(player.summonerId)
 	+"</a></td>";
 	
 	return s;
 }
 
-/*
-Retrieve Player Masteries
-*/
+function getPlayerStatsChampion(summonerID,championID){
+	var temp = "";
+	if (summonerID != 0){
+		//average data on champion
+		$.ajax({
+			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + getAPIKey(),
+			type: 'GET',
+			dataType: 'json',
+			async: false,
+			data: {
+				'championIds':""+championID
+			},
+			success:function (resp){
+				matches =resp['matches'];
+				
+				temp = compilePlayerStatsChampion(matches);
+
+				
+			},
+			error:function (XMLHttpRequest, textStatus, errorThrown){
+				alert("error getting match history");
+				
+			}
+		});
+	}
+	return temp;
+}
+
+
+function compilePlayerStatsChampion(matches){
+	if (matches === undefined){
+		return "<div class='c-g-info-box-title'>No ranked games found on this champion.</div></br>";
+	}
+	var kills = 0;
+	var deaths = 0;
+	var assists = 0;
+	var cs = 0;
+	
+	matches.forEach(function (match) {
+		var participants = match['participants'];
+		var stats = participants[0]['stats'];
+		kills = kills+stats.kills;
+		deaths = deaths+stats.deaths;
+		assists = assists+stats.assists;
+		cs = cs+stats.minionsKilled;
+
+	});
+	if(matches.length != 0){
+		kills = Math.floor(kills/matches.length*10)/10;
+		deaths = Math.floor(deaths/matches.length*10)/10;
+		assists = Math.floor(assists/matches.length*10)/10;
+		cs = Math.floor(cs/matches.length*10)/10;
+	}
+	var result = "<div class='c-g-info-box-title'>Champ stats last "+matches.length+"</div>"
+	+"<div class='c-g-info-box'>KDA: "+kills+" / "+deaths+" / "+assists +"</div>"
+	+"<div class='c-g-info-box'>CS: "+cs+"</div>";
+	return result;
+}
+
+
+function getPlayerStats(summonerID){
+	var temp = "";
+	if (summonerID != 0){
+		//average data on player
+		$.ajax({
+			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + getAPIKey(),
+			type: 'GET',
+			dataType: 'json',
+			async: false,
+			data: {
+			},
+			success:function (resp){
+				matches =resp['matches'];
+				temp = compilePlayerStats(matches);
+				
+			},
+			error:function (XMLHttpRequest, textStatus, errorThrown){
+				alert("error getting match history");
+				
+			}
+		});
+	}
+	return temp;
+}
+
+
+function compilePlayerStats(matches){
+	if (matches === undefined){
+		return "<div class='c-g-info-box-title'>This player has not played ranked games this season.</div></br>";
+	}
+	var kills = 0;
+	var deaths = 0;
+	var assists = 0;
+	var lane = {};
+	lane['MID'] = 0;
+	lane['BOT'] = 0;
+	lane['MIDDLE'] = 0;
+	lane['BOTTOM'] = 0;
+	lane['TOP'] = 0;
+	lane['JUNGLE'] = 0;
+	matches.forEach(function (match) {
+		var participants = match['participants'];
+		var stats = participants[0]['stats'];
+		kills = kills+stats.kills;
+		deaths = deaths+stats.deaths;
+		assists = assists+stats.assists;
+		var timeline = participants[0].timeline;
+		lane[timeline.lane] += 1;
+	});
+	var recentLane = "MIDDLE";
+	if(matches.length != 0){
+		kills = Math.floor(kills/matches.length*10)/10;
+		deaths = Math.floor(deaths/matches.length*10)/10;
+		assists = Math.floor(assists/matches.length*10)/10;
+		lane['MIDDLE'] += lane['MID'];
+		lane['BOTTOM'] += lane['BOT'];
+		if (lane['TOP'] > lane[recentLane]){
+			recentLane = 'TOP';
+		}
+		else if (lane['JUNGLE'] > lane[recentLane]){
+			recentLane = 'JUNGLE';
+		}
+		else if (lane['BOTTOM'] > lane[recentLane]){
+			recentLane = 'BOTTOM';
+		} 
+	}
+	var result = "<div class='c-g-info-box-title'>Player stats last "+matches.length+"</div>"
+	+"<div class='c-g-info-box'>KDA: "+kills+" / "+deaths+" / "+assists+"</div>"
+	+"<div class='c-g-info-box'>Recent Lane: "+recentLane+"</div>";
+	
+	//tilt check
+	result = result+tiltCheck(matches);
+	return result;
+}
+
+
+function tiltCheck(matches){
+	if (matches === undefined){ return "";}
+	
+	var done = false;
+	var index = matches.length-1;
+	var feed = 0;
+	while( index >= 0 && done == false){
+		//check most recent game time. compare to now time.
+		if (!isRecentGame(matches[index].matchCreation,6)){ //game started too long ago to be on tilt.
+			done = true;
+		}else{ //played recently
+			var match = matches[index];
+			var participant = (match['participants'])[0];
+			var stats = participant['stats'];
+			if (stats.deaths > stats.kills && stats.deaths > stats.assists){
+				feed = feed + 1;
+			}
+			
+		}
+		if(feed >=2){
+			return "Warning: This player has recently fed in at least their last "+feed+" games. They are likely to be on tilt.";
+		}
+		index = index - 1;
+	}
+	return "";
+}
+
+function isRecentGame(timeOfMatch, hours){
+
+    var seconds = (new Date().getTime() - timeOfMatch)/1000;
+    var h = Math.floor(seconds/60/60); //hours
+
+	if (h <= hours){ //if youve played recently within the designated hours..
+		return true;
+	}else{
+		return false;
+	}
+}
+
+//gets player masteries
 function getMasteries() {
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
@@ -142,12 +387,7 @@ function getMasteries() {
 }
 
 
-
-/*
-Retrieve 10 Match History records.
-Parameters:
-queue - RANKED_SOLO_5x5, RANKED_TEAM_3x3, RANKED_TEAM_5x5 or empty for all.
-*/
+//gets match history
 function getMatchHistory(queue){
 	switch(queue){
 		case 'fives': filter = "RANKED_TEAM_5x5"; break;
@@ -165,17 +405,19 @@ function getMatchHistory(queue){
 			type: 'GET',
 			dataType: 'json',
 			data: {
-				'rankedQueues':filter
+				'rankedQueues':filter,
 			},
 			success:function (resp){
 				matches =resp['matches'];
 				document.getElementById("matchesAll").innerHTML = "";
 				document.getElementById("load-more").innerHTML = '<br><br><a href="#newData" onclick="loadMore();" id="button-load-more" class="m-h-load-more-box"><h5>LOAD MORE</h5></a>';
 				var temp = "";
-				matches.forEach(function (match) {
-						temp = compileMatchData(temp,match);
-						});
-				document.getElementById("matchesAll").innerHTML = temp + "<div id='newData' name='newData'></div>";
+				if (matches != undefined){
+					matches.forEach(function (match) {
+							temp = compileMatchData(temp,match);
+							});
+					document.getElementById("matchesAll").innerHTML = temp + "<div id='newData' name='newData'></div>";
+				}
 				removeLoadSpinner();
 				numRecords = 10;
 			},
@@ -189,9 +431,6 @@ function getMatchHistory(queue){
 
 }
 
-/*
-Retrieve Additional 10 Match History records appended to previous results.
-*/
 function loadMore(){
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
@@ -224,12 +463,6 @@ function loadMore(){
 	}
 }
 
-
-/*
-Parameters:
-temp - String to append data to
-match - Match JSON Object
-*/
 function compileMatchData(temp,match) {
 	var stats = match.participants[0].stats;
 	var num = getChampionIconById(match.participants[0].championId);
@@ -250,25 +483,19 @@ function compileMatchData(temp,match) {
 	return temp;
 }
 
-/*
-Add Load spinner
-*/
+//load spinners
+
 function addLoadSpinner(){
 	$('#overlay').remove();
-	$("#center").append("<div id='overlay' ><img src='loading.gif' ></div>");
+	$("#output").append("<div id='overlay' ><img src='loading.gif' ></div>");
 
 }
 
-/*
-Remove Load spinner
-*/
 function removeLoadSpinner(){
 	$('#overlay').remove();
 }
 
-/*
-Image Icons. Setup champion ids  to match image resources.
-*/
+//Retrieve By Id functions
 function getChampionIconById(ID){
 	if (champs[1] === undefined){
 		var page = 30;
@@ -329,7 +556,7 @@ function getChampionIconById(ID){
 		champs[59] = page*1 + 6; //jarvanIV
 		champs[60] = 20; //elise
 		champs[61] = page*2 + 11; // orianna
-		champs[62] = page*2 + 1; //wukong
+		champs[62] = page*2 + 1; //wukong / monkeyKing
 		champs[63] = 10; //brand
 		champs[64] = page*1 + 20; //leesin
 		champs[67] = page*3 + 16; // vayne
@@ -406,7 +633,7 @@ function getChampionNameById(ID){
 		champnames[2] = "olaf";
 		champnames[3] = "galio";
 		champnames[4] = "TwistedFate";
-		champnames[5] = "xinzhao";
+		champnames[5] = "XinZhao";
 		champnames[6] = "urgot";
 		champnames[7] = "leblanc";
 		champnames[8] = "vladimir";
@@ -458,7 +685,7 @@ function getChampionNameById(ID){
 		champnames[59] = "jarvanIV";
 		champnames[60] = "elise";
 		champnames[61] = "orianna";
-		champnames[62] = "wukong";
+		champnames[62] = "MonkeyKing";
 		champnames[63] = "brand";
 		champnames[64] = "LeeSin";
 		champnames[67] = "vayne";
@@ -482,7 +709,7 @@ function getChampionNameById(ID){
 		champnames[90] = "malzahar";
 		champnames[91] = "talon";
 		champnames[92] = "riven";
-		champnames[96] = "kogmaw";
+		champnames[96] = "KogMaw";
 		champnames[98] = "shen";
 		champnames[99] = "lux";
 		champnames[101] = "xerath";
@@ -548,6 +775,57 @@ function getSummonerSkillIconById(ID){
 	return summonerskills[ID];
 }
 
+function getMapNameById(ID){
+	if (mapnames[1] === undefined){
+		mapnames[1] = "Summoner's Rift - Original Summer Variant";
+		mapnames[2]	= "Summoner's Rift - Original Autumn Variant";
+		mapnames[3] = "The Proving Grounds";
+		mapnames[4] = "Twisted Treeline";	
+		mapnames[8] = "The Crystal Scar";	
+		mapnames[10] = "Twisted Treeline";
+		mapnames[11] = "Summoner's Rift";
+		mapnames[12] = "Howling Abyss";
+	}
+	return mapnames[ID];
+}
+
+function getGameModeById(ID){
+	if (gamemode[0] === undefined){
+		gamemode[0] = "Custom";
+		gamemode[2] = "Normal 5v5 Blind";
+		gamemode[7] = "Bot 5v5";
+		gamemode[31] = "Bot Intro";
+		gamemode[32] = "Bot Beginner";
+		gamemode[33] = "Bot Intermediate";
+		gamemode[8] = "Normal 3v3";
+		gamemode[14] = "Normal 5v5 Draft";
+		gamemode[16] = "Dominion 5v5 Blind";
+		gamemode[17] = "Dominion 5v5 Draft";
+		gamemode[25] = "Dominion Coop vs AI";
+		gamemode[4] = "Ranked Solo 5v5";
+		gamemode[9] = "Ranked Premade 3v3";
+		gamemode[6] = "Ranked Premade 5v5";
+		gamemode[41] = "Ranked Team 3v3";
+		gamemode[42] = "Ranked Team 5v5";
+		gamemode[52] = "Bot 3v3";
+		gamemode[61] = "Team Builder 5v5";
+		gamemode[65] = "ARAM";
+		gamemode[70] = "One for All";
+		gamemode[72] = "Snowdown 1v1";
+		gamemode[73] = "Snowdown 2v2";
+		gamemode[75] = "Hexakill";
+		gamemode[76] = "Ultra Rapid Fire";
+		gamemode[83] = "Ultra Rapid Fire vs AI";
+		gamemode[91] = "Doom Bots Rank 1";
+		gamemode[92] = "Doom Bots Rank 2";
+		gamemode[93] = "Doom Bots Rank 5";
+		gamemode[96] = "Ascension";
+		gamemode[98] = "Hexakill";
+		gamemode[300] = "King Poro 5v5";
+		gamemode[310] = "Nemesis";
+	}
+	return gamemode[ID];
+}
 /*
 Dynamic: show Match History page
 */
@@ -559,7 +837,7 @@ function showMatchHistory(){
 			dataType: 'html',
 			data: {},
             success : function (data) {
-				$('#center').html(data);
+				$('#output').html(data);
             },
 			error:function (){
 				alert("error: could not load match history html");
@@ -568,18 +846,21 @@ function showMatchHistory(){
 	 });
 }
 
-/*
-Match History search on Enter key
-*/
+
+//Run on enter
 function mhRunScript(e) {
     if (e.keyCode == 13) {
 		getMatchHistory('all');
     }
 }
 
-/*
-Dynamic: show Masteries page
-*/
+function cgRunScript(e) {
+
+    if (e.keyCode == 13) {
+		getCurrentGameInfo();
+    }
+}
+
 function showMasteries(){
 	$(document).ready(function() {
 	 $.ajax({
@@ -590,7 +871,7 @@ function showMasteries(){
 			
 			},
             success : function (data) {
-				$('#center').html(data);
+				$('#output').html(data);
             },
 			error:function (){
 				alert("error: could not load masteries html");
@@ -599,9 +880,6 @@ function showMasteries(){
 	 });
 }
 
-/*
-Dynamic: show Current Game page
-*/
 function showCurrentGame(){
 	$(document).ready(function() {
 	 $.ajax({
@@ -612,7 +890,7 @@ function showCurrentGame(){
 			
 			},
             success : function (data) {
-				$('#center').html(data);
+				$('#output').html(data);
             },
 			error:function (){
 				alert("error: could not load masteries html");
@@ -621,16 +899,35 @@ function showCurrentGame(){
 	 });
 }
 
-/*
-current game on enter key
-*/
-function cgRunScript(e) {
 
-    if (e.keyCode == 13) {
-		getCurrentGameInfo();
-    }
-}
-
+//Helper functions
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+function elapsedTime (createdAt)
+{
+	if(createdAt == 0){
+		return '--:--';
+	}
+    var seconds = (new Date().getTime() - createdAt)/1000;
+	
+    var h = Math.floor(seconds/60/60); //hours
+	var n = Math.floor(seconds/60); //minutes
+	var s = Math.floor(seconds%60); //seconds
+
+	if(s < 10){
+		return h*60+n + ":0" +s;
+	}else{
+		return h*60+n + ':' + s;
+	}
+}
+function replaceAll(find, replace, str) {
+  return str.replace(new RegExp(find, 'g'), replace);
+}
+
+//update every second if necessary
+setInterval(function() {
+	if(document.getElementById("gameTime") != null && document.getElementById("gameTime").getAttribute("startTime") != 0){
+		document.getElementById("gameTime").innerHTML = "<h5>Game Time: "+ elapsedTime(Number(document.getElementById("gameTime").getAttribute("startTime"))) + "</h5>";
+	}
+}, 1000); 
