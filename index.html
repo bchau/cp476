@@ -6,7 +6,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>LOL - Tilt checker</title>
+<title>LOL TILT</title>
 
 <!-- Startup configuration -->
 <link rel="manifest" href="manifest.json">
@@ -14,17 +14,17 @@
 
 <body>
 	<!-- HEADER-->
-	<div id = "north" class="banner">
-		<a href="index.html" class = "banner-box"><h1>ARE YOU ON TILT?</h1></a>
+	<div id = "north" class="noselect banner">
+		<a href="index.html" class = "banner-box"><h1>LOL TILT</h1></a>
 		
 	</div>
 
-	<div class = "banner" id = "nav" >
+	<div class = "noselect banner" id = "nav" >
 	  <a href="#" onclick="showMatchHistory();" id="button-match-history" class="nav-box">
 	  <h5>Match History</h5></a>
 	  
-	  <a href="#" onclick="showMasteries();" id="button-masteries" class="nav-box">
-	  <h5>Masteries</h5></a>
+	  <!--<a href="#" onclick="showMasteries();" id="button-masteries" class="nav-box">
+	  <h5>Masteries</h5></a>-->
 	  
 	  <a href="#" onclick="showCurrentGame();" id="button-masteries" class="nav-box">
 	  <h5>Current Game</h5></a>
@@ -37,7 +37,7 @@
 
 			<a class="input-text">Enter a Summoner Name: </a>
 			<br />
-			<input id="userName" class="input-box" maxlength="16" onkeypress="return cgRunScript(event)"/>
+			<input id="userName" class="input-box" maxlength="16"/>
 			<br />
 		</div>
 		<div id="output">

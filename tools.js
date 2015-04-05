@@ -4,10 +4,14 @@ var champs = {};
 var champnames = {};
 var summonerskills = {};
 var mapnames = {};
+var mapimages = {};
 var gamemode ={};
 var numRecords = 0;
 var filter = "";
 var keyCount = 0;
+var mode = "cg";
+var cgID = "";
+var cgName = "";
 
 //bypass api key restrictions (temporary)
 function getAPIKey(){
@@ -50,6 +54,7 @@ function summonerLookUp( ID) {
 
 //get current game info
 function getCurrentGameInfo(){
+	if(mode =="cg"){
 	addLoadSpinner();
 	ID = document.getElementById("userName").value;
 	var summonerID = summonerLookUp(ID);
@@ -76,6 +81,9 @@ function getCurrentGameInfo(){
 				removeLoadSpinner();
 			}
 		});
+	}else{
+		removeLoadSpinner();
+	}
 	}
 }
 
@@ -123,22 +131,22 @@ function compilePlayerData(data) {
 		var col = (num%10)*size;
 			
 		switch(ban.pickTurn){
-			case 1: ban1 = "<a class='champion-icon blue-border' style='background-image:url(images/champion"+page
+			case 1: ban1 = "<a class='ban-icon blue-border' style='background-image:url(images/champion"+page
 			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
 			break;
-			case 2: ban2 = "<a class='champion-icon purple-border' style='background-image:url(images/champion"+page
+			case 2: ban2 = "<a class='ban-icon purple-border' style='background-image:url(images/champion"+page
 			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
 			break;
-			case 3: ban3 = "<a class='champion-icon blue-border' style='background-image:url(images/champion"+page
+			case 3: ban3 = "<a class='ban-icon blue-border' style='background-image:url(images/champion"+page
 			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
 			break;
-			case 4: ban4 = "<a class='champion-icon purple-border' style='background-image:url(images/champion"+page
+			case 4: ban4 = "<a class='ban-icon purple-border' style='background-image:url(images/champion"+page
 			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
 			break;
-			case 5: ban5 = "<a class='champion-icon blue-border' style='background-image:url(images/champion"+page
+			case 5: ban5 = "<a class='ban-icon blue-border' style='background-image:url(images/champion"+page
 			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
 			break;
-			case 6: ban6 = "<a class='champion-icon purple-border' style='background-image:url(images/champion"+page
+			case 6: ban6 = "<a class='ban-icon purple-border' style='background-image:url(images/champion"+page
 			+".png);background-position:-"+col+"px -"+row+"px;'></a>"; 
 			break;
 			default:
@@ -172,6 +180,8 @@ function compileTeamData(s,player){
 	+"<br><div class='summoner-spell-icon' style='background-image:url(images/spells/"+getSummonerSkillIconById(player.spell2Id)+".png)'></div>"
 	+"<br>"+getPlayerStatsChampion(player.summonerId,player.championId)
 	+getPlayerStats(player.summonerId)
+	+"<div href='#matchesAll' class='c-g-load-more noselect' onclick='getCurrentGamePlayersMatchHistory("
+	+player.summonerId+',"'+player.summonerName+'")'+"'>LOAD<br>MORE</div>"
 	+"</a></td>";
 	
 	return s;
@@ -307,11 +317,10 @@ function compilePlayerStats(matches){
 	+"<div class='c-g-info-box'>KDA: "+kills+" / "+deaths+" / "+assists+"</div>"
 	+"<div class='c-g-info-box'>Recent Lane: "+recentLane+"</div>";
 	
-	//tilt check
-	result = result+tiltCheck(matches);
+	//tilt check & streak
+	result = result+getStreak(matches)+tiltCheck(matches);
 	return result;
 }
-
 
 function tiltCheck(matches){
 	if (matches === undefined){ return "";}
@@ -330,14 +339,53 @@ function tiltCheck(matches){
 			if (stats.deaths > stats.kills && stats.deaths > stats.assists){
 				feed = feed + 1;
 			}
-			
 		}
-		if(feed >=2){
-			return "Warning: This player has recently fed in at least their last "+feed+" games. They are likely to be on tilt.";
+		
+		index = index - 1;
+	}
+	if(feed >=2){
+		return "<div class='warning'><div class='warning-box'>"
+		+"This player has recently fed in their last "+feed
+		+" games. They are likely to be on tilt."
+		+"</div></div>";
+	}
+	return "";
+}
+
+function getStreak(matches){
+	if (matches === undefined){ return "";}
+	var done = false;
+	var index = matches.length-1;
+	
+	
+	var match = matches[index];
+	var participant = (match['participants'])[0];
+	var stats = participant['stats'];
+	index = index - 1;
+	var win = stats.winner;
+	var streak = 1;
+	
+	while( index >= 0 && done == false){
+		var match = matches[index];
+		var participant = (match['participants'])[0];
+		var stats = participant['stats'];
+		if(stats.winner == win){
+			streak = streak+1;
+		}else{
+			done = true;
 		}
 		index = index - 1;
 	}
-	return "";
+	
+	var result = "";
+	if(win == true){
+		result = "<div class='text-win-streak'>"+streak + " game win streak</div>"; 
+	}
+	else{
+		result = "<div class='text-lose-streak'>"+streak + " game lose streak</div>";
+	}
+	return result;
+
 }
 
 function isRecentGame(timeOfMatch, hours){
@@ -359,7 +407,7 @@ function getMasteries() {
 	var summonerID = summonerLookUp(ID);
 	if (summonerID != 0){
 		$.ajax({
-			url: "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + summonerID + "/masteries?api_key=" + APIKEY,
+			url: "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + summonerID + "/masteries?api_key=" + getAPIKey(),
 			type: 'GET',
 			dataType: 'json',
 			data: {
@@ -388,7 +436,8 @@ function getMasteries() {
 
 
 //gets match history
-function getMatchHistory(queue){
+function getMatchHistory(queue, override){
+	if(mode == "mh" || override == true){
 	switch(queue){
 		case 'fives': filter = "RANKED_TEAM_5x5"; break;
 		case 'threes': filter = "RANKED_TEAM_3x3";break;
@@ -396,12 +445,24 @@ function getMatchHistory(queue){
 		default: filter = ""; break;
 	}
 	
+	
 	addLoadSpinner();
-	ID = document.getElementById("userName").value;
-	var summonerID = summonerLookUp(ID);
+	var summonerID = "";
+	var loadMoreOverride = "";
+	var displayName = "";
+	if(override == true){
+		summonerID = cgID;
+		loadMoreOverride = "true";
+		displayName = cgName;
+	}
+	else{
+		ID = document.getElementById("userName").value;
+		summonerID = summonerLookUp(ID);
+		displayName = ID;
+	}
 	if (summonerID != 0){
 		$.ajax({
-			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
+			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + getAPIKey(),
 			type: 'GET',
 			dataType: 'json',
 			data: {
@@ -409,8 +470,9 @@ function getMatchHistory(queue){
 			},
 			success:function (resp){
 				matches =resp['matches'];
+				document.getElementById("label-summoner-name").innerHTML = "Results for summoner: "+displayName;
 				document.getElementById("matchesAll").innerHTML = "";
-				document.getElementById("load-more").innerHTML = '<br><br><a href="#newData" onclick="loadMore();" id="button-load-more" class="m-h-load-more-box"><h5>LOAD MORE</h5></a>';
+				document.getElementById("load-more").innerHTML = '<br><br><a href="#newData" onclick="loadMore('+loadMoreOverride+');" id="button-load-more" class="m-h-load-more-box"><h5>LOAD MORE</h5></a>';
 				var temp = "";
 				if (matches != undefined){
 					matches.forEach(function (match) {
@@ -427,17 +489,24 @@ function getMatchHistory(queue){
 				
 			}
 		});
+	}else{
+		removeLoadSpinner();
 	}
-
+	}
 }
 
-function loadMore(){
+function loadMore(override){
 	addLoadSpinner();
-	ID = document.getElementById("userName").value;
-	var summonerID = summonerLookUp(ID);
+	var summonerID = "";
+	if(override == true){
+		summonerID = cgID;
+	}else{
+		ID = document.getElementById("userName").value;
+		summonerID = summonerLookUp(ID);
+	}
 	if (summonerID != 0){
 		$.ajax({
-			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + APIKEY,
+			url: "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/"+summonerID+"?api_key=" + getAPIKey(),
 			type: 'GET',
 			dataType: 'json',
 			data: {
@@ -470,16 +539,22 @@ function compileMatchData(temp,match) {
 	var page = Math.floor(num/30);
 	var row = Math.floor((num%30)/10)*size;
 	var col = (num%10)*size;
+	
+	var tdStyle = "m-h-win-box";
+	if (!stats.winner){
+		tdStyle = "m-h-lose-box";
+	}
 	temp = 
-	"<tr><td style='width:100px'>"+
-		"<a class='champion-icon' style='background-image:url(images/champion"+page+".png);background-position:-"+col+"px -"+row+"px;'></a>"+
-		"<br>ChampionId: " + match.participants[0].championId + 
-	"</td><td>"+
-		"Match ID: "+match.matchId + 
-		"<br>Queue Type: "+match.queueType+ 
-		"<br>MapId: "+ match.mapId+ 
-		"<br>KDA: " + stats.kills +"/" +stats.deaths+"/"+stats.assists +
-	"</td></tr>"+ temp;
+	"<tr><td class='m-h-icon-box' style='width:100px'>"+
+		"<a class='champion-icon' style='background-image:url(images/champion"+page+".png);background-position:-"+col+"px -"+row+"px;'></a>"+ 
+	"</td><td class='"+tdStyle+"'>"
+		+"<div class='m-h-info-box' style='background-image:url("
+		+getMapImageById(match.mapId)+".png); background-repeat: no-repeat;' >"
+		+"<h4>"+getMapNameById(match.mapId)+ "</h4></div>"
+		+"<div class='m-h-info-box'><h4>"+match.season+ "</h4></div>"
+		+"<div class='m-h-info-box'><h4>"+match.queueType+ "</h4></div>"
+		+"<div class='m-h-info-box'><h4>KDA: " + stats.kills +" / " +stats.deaths+" / "+stats.assists + "</h4></div>"
+	+"</td></tr>"+ temp;
 	return temp;
 }
 
@@ -487,7 +562,7 @@ function compileMatchData(temp,match) {
 
 function addLoadSpinner(){
 	$('#overlay').remove();
-	$("#output").append("<div id='overlay' ><img src='loading.gif' ></div>");
+	$("#output").append("<div id='overlay' ><img src='images/loading.gif' ></div>");
 
 }
 
@@ -789,6 +864,20 @@ function getMapNameById(ID){
 	return mapnames[ID];
 }
 
+function getMapImageById(ID){
+	if (mapimages[1] === undefined){
+		mapimages[1] = "images/summoners_rift";
+		mapimages[2] = "images/summoners_rift";
+		mapimages[3] = "images/the_proving_grounds";
+		mapimages[4] = "images/the_twisted_treeline";	
+		mapimages[8] = "images/the_crystal_scar";	
+		mapimages[10] = "images/the_twisted_treeline";
+		mapimages[11] = "images/summoners_rift";
+		mapimages[12] = "images/howling_abyss";
+	}
+	return mapimages[ID];
+}
+
 function getGameModeById(ID){
 	if (gamemode[0] === undefined){
 		gamemode[0] = "Custom";
@@ -838,27 +927,13 @@ function showMatchHistory(){
 			data: {},
             success : function (data) {
 				$('#output').html(data);
+				mode="mh";
             },
 			error:function (){
 				alert("error: could not load match history html");
 			}
         });
 	 });
-}
-
-
-//Run on enter
-function mhRunScript(e) {
-    if (e.keyCode == 13) {
-		getMatchHistory('all');
-    }
-}
-
-function cgRunScript(e) {
-
-    if (e.keyCode == 13) {
-		getCurrentGameInfo();
-    }
 }
 
 function showMasteries(){
@@ -891,12 +966,45 @@ function showCurrentGame(){
 			},
             success : function (data) {
 				$('#output').html(data);
+				mode = "cg";
             },
 			error:function (){
 				alert("error: could not load masteries html");
 			}
         });
 	 });
+}
+
+function getCurrentGamePlayersMatchHistory(ID,name){
+	//show
+	$(document).ready(function() {
+	 $.ajax({
+            url : "matchhistory2.html",
+			async: false,
+			dataType: 'html',
+			data: {},
+            success : function (data) {
+				if ( document.getElementById("matchesAll") == null){ //if it doesnt exist
+					//append html
+					var newcontent= document.createElement('div'); 
+					newcontent.innerHTML= data; 
+					
+					while (newcontent.firstChild) {
+						document.getElementById("output").appendChild(newcontent.firstChild);
+					}
+				}
+				
+            },
+			error:function (){
+				alert("error: could not load match history html");
+			}
+        });
+	 });
+	//execute
+	
+	cgName = name;
+	cgID = ID;
+	getMatchHistory("",true);
 }
 
 
